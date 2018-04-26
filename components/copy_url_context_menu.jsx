@@ -6,9 +6,9 @@ import React from 'react';
 import {ContextMenu, ContextMenuTrigger, MenuItem} from 'react-contextmenu';
 import {FormattedMessage} from 'react-intl';
 
-import * as Utils from '../utils/utils';
+import * as Utils from 'utils/utils';
 
-export default class CopyUrlContextMenu extends React.Component {
+export default class CopyUrlContextMenu extends React.PureComponent {
     static propTypes = {
 
         /**
@@ -43,16 +43,19 @@ export default class CopyUrlContextMenu extends React.Component {
         );
 
         const contextMenuTrigger = (
-            <ContextMenuTrigger id={'copy-url-context-menu' + this.props.menuId}>
+            <ContextMenuTrigger
+                id={'copy-url-context-menu' + this.props.menuId}
+                renderTag='span'
+            >
                 {this.props.children}
             </ContextMenuTrigger>
         );
 
         return (
-            <span>
+            <React.Fragment>
                 {contextMenu}
                 {contextMenuTrigger}
-            </span>
+            </React.Fragment>
         );
     }
 }

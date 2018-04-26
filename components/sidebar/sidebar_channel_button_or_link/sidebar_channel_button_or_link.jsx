@@ -3,12 +3,10 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Link} from 'react-router-dom';
 
-import {browserHistory} from 'utils/browser_history';
 import {mark, trackEvent} from 'actions/diagnostics_actions.jsx';
-import {isDesktopApp} from 'utils/user_agent.jsx';
-import CopyUrlContextMenu from 'components/copy_url_context_menu';
+
+import InternalLink from 'components/internal_link';
 
 import SidebarChannelButtonOrLinkIcon from './sidebar_channel_button_or_link_icon.jsx';
 import SidebarChannelButtonOrLinkCloseButton from './sidebar_channel_button_or_link_close_button.jsx';
@@ -35,12 +33,7 @@ export default class SidebarChannelButtonOrLink extends React.PureComponent {
     trackChannelSelectedEvent = () => {
         mark('SidebarChannelLink#click');
         trackEvent('ui', 'ui_channel_selected');
-    }
-
-    handleClick = () => {
-        this.trackChannelSelectedEvent();
-        browserHistory.push(this.props.link);
-    }
+    };
 
     render = () => {
         let badge = null;
@@ -70,33 +63,15 @@ export default class SidebarChannelButtonOrLink extends React.PureComponent {
             </React.Fragment>
         );
 
-        let element;
-        if (isDesktopApp()) {
-            element = (
-                <CopyUrlContextMenu
-                    link={this.props.link}
-                    menuId={this.props.channelId}
-                >
-                    <button
-                        className={'btn btn-link ' + this.props.rowClass}
-                        onClick={this.handleClick}
-                    >
-                        {content}
-                    </button>
-                </CopyUrlContextMenu>
-            );
-        } else {
-            element = (
-                <Link
-                    to={this.props.link}
-                    className={this.props.rowClass}
-                    onClick={this.trackChannelSelectedEvent}
-                >
-                    {content}
-                </Link>
-            );
-        }
-
-        return element;
+        return (
+            <InternalLink
+                buttonClassName={'btn btn-link'}
+                className={this.props.rowClass}
+                link={this.props.link}
+                onClick={this.trackChannelSelectedEvent}
+            >
+                {content}
+            </InternalLink>
+        );
     }
 }

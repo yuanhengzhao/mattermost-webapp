@@ -3,13 +3,13 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Link} from 'react-router-dom';
 
 import * as GlobalActions from 'actions/global_actions.jsx';
+import InternalLink from 'components/internal_link';
+import LocalDateTime from 'components/local_date_time';
 import TeamStore from 'stores/team_store.jsx';
 import {isMobile} from 'utils/user_agent.jsx';
 import {isMobile as isMobileView} from 'utils/utils.jsx';
-import LocalDateTime from 'components/local_date_time';
 
 export default class PostTime extends React.PureComponent {
     static propTypes = {
@@ -59,13 +59,14 @@ export default class PostTime extends React.PureComponent {
         }
 
         return (
-            <Link
-                to={`/${this.state.currentTeamDisplayName}/pl/${this.props.postId}`}
+            <InternalLink
+                link={`/${this.state.currentTeamDisplayName}/pl/${this.props.postId}`}
+                buttonClassName='post__permalink--button'
                 className='post__permalink'
                 onClick={this.handleClick}
             >
                 {localDateTime}
-            </Link>
+            </InternalLink>
         );
     }
 }

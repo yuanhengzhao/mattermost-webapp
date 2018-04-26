@@ -1543,6 +1543,15 @@
         &:hover {
             text-decoration: underline;
         }
+
+        &.post__permalink--button {
+            background: none;
+            border: none;
+            color: inherit;
+            display: inline;
+            outline: none;
+            padding: 0;
+        }
     }
 
     .post-loading-gif {
