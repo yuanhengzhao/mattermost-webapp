@@ -28,6 +28,16 @@ export default class PostTime extends React.PureComponent {
          * The post id of posting being rendered
          */
         postId: PropTypes.string,
+
+        /**
+         * Called on the desktop app when the context menu closes
+         */
+        onContextMenuHide: PropTypes.func,
+
+        /**
+         * Called on the desktop app when the context menu opens
+         */
+        onContextMenuShow: PropTypes.func,
     };
 
     static defaultProps = {
@@ -60,10 +70,13 @@ export default class PostTime extends React.PureComponent {
 
         return (
             <InternalLink
+                ref='link'
                 link={`/${this.state.currentTeamDisplayName}/pl/${this.props.postId}`}
                 buttonClassName='post__permalink--button'
                 className='post__permalink'
                 onClick={this.handleClick}
+                onContextMenuShow={this.props.onContextMenuShow}
+                onContextMenuHide={this.props.onContextMenuHide}
             >
                 {localDateTime}
             </InternalLink>

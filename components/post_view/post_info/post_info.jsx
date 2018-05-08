@@ -39,7 +39,7 @@ export default class PostInfo extends React.PureComponent {
         handleCommentClick: PropTypes.func.isRequired,
 
         /*
-         * Funciton called when the post options dropdown is opened
+         * Function called when the post options dropdown is opened
          */
         handleDropdownOpened: PropTypes.func.isRequired,
 
@@ -116,7 +116,9 @@ export default class PostInfo extends React.PureComponent {
         super(props);
 
         this.state = {
+            showDotMenu: false,
             showEmojiPicker: false,
+            showPostTimeMenu: false,
             reactionPickerOffset: 21,
         };
     }
@@ -167,13 +169,26 @@ export default class PostInfo extends React.PureComponent {
         return this.refs.dotMenu;
     };
 
+    handlePostTimeMenuShow = () => {
+        this.setState({
+            showPostTimeMenu: true,
+        });
+    };
+
+    handlePostTimeMenuHide = () => {
+        this.setState({
+            showPostTimeMenu: false,
+        });
+    };
+
     buildOptions = (post, isSystemMessage, fromAutoResponder, idCount) => {
         if (!PostUtils.shouldShowDotMenu(post)) {
             return null;
         }
 
         const {isMobile, isReadOnly} = this.props;
-        const hover = this.props.hover || this.state.showEmojiPicker || this.state.showDotMenu;
+        const hover = this.props.hover || this.state.showEmojiPicker ||
+            this.state.showDotMenu || this.state.showPostTimeMenu;
 
         let comments;
         let react;
@@ -322,7 +337,7 @@ export default class PostInfo extends React.PureComponent {
         }
 
         let postTime;
-        if (this.props.hover || this.props.showTimeWithoutHover) {
+        if (this.props.hover || this.props.showTimeWithoutHover || this.state.showPostTimeMenu) {
             // timestamp should not be a permalink if the post has been deleted, is ephemeral message, or is pending
             const isPermalink = !(isEphemeral ||
                 Posts.POST_DELETED === post.state ||
@@ -333,6 +348,8 @@ export default class PostInfo extends React.PureComponent {
                     isPermalink={isPermalink}
                     eventTime={post.create_at}
                     postId={post.id}
+                    onContextMenuShow={this.handlePostTimeMenuShow}
+                    onContextMenuHide={this.handlePostTimeMenuHide}
                 />
             );
         }

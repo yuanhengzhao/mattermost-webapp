@@ -25,11 +25,18 @@ export default class CopyUrlContextMenu extends React.PureComponent {
          * A unique id differentiating this instance of context menu from others on the page. Will be set to a random value if not provided.
          */
         menuId: PropTypes.string.isRequired,
+
+        onHide: PropTypes.func,
+        onShow: PropTypes.func,
     };
 
     render() {
         const contextMenu = (
-            <ContextMenu id={'copy-url-context-menu' + this.props.menuId}>
+            <ContextMenu
+                id={'copy-url-context-menu' + this.props.menuId}
+                onHide={this.props.onHide}
+                onShow={this.props.onShow}
+            >
                 <MenuItem
                     data={{link: this.props.link}}
                     onClick={Utils.copyToClipboard}

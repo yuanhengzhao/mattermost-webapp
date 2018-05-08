@@ -28,6 +28,16 @@ export default class InternalLink extends React.PureComponent {
          */
         className: PropTypes.string,
 
+        /**
+         * Called when the link is a button (ie. in the desktop app) and the context menu closes
+         */
+        onContextMenuHide: PropTypes.func,
+
+        /**
+         * Called when the link is a button (ie. in the desktop app) and the context menu opens
+         */
+        onContextMenuShow: PropTypes.func,
+
         children: PropTypes.node.isRequired,
         onClick: PropTypes.func,
         link: PropTypes.string.isRequired,
@@ -49,11 +59,13 @@ export default class InternalLink extends React.PureComponent {
 
     render() {
         let element;
-        if (isDesktopApp()) {
+        if (true || isDesktopApp()) {
             element = (
                 <CopyUrlContextMenu
                     link={this.props.link}
                     menuId={this.menuId}
+                    onHide={this.props.onContextMenuHide}
+                    onShow={this.props.onContextMenuShow}
                 >
                     <button
                         className={this.props.className + ' ' + this.props.buttonClassName}
@@ -75,6 +87,6 @@ export default class InternalLink extends React.PureComponent {
             );
         }
 
-        return element;
+        return <span ref='ref'>{element}</span>;
     }
 }
