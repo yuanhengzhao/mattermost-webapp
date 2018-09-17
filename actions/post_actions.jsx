@@ -1,7 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {batchActions} from 'redux-batched-actions';
 import {PostTypes, SearchTypes} from 'mattermost-redux/action_types';
 import {getMyChannelMember} from 'mattermost-redux/actions/channels';
 import * as PostActions from 'mattermost-redux/actions/posts';
@@ -16,7 +15,7 @@ import ChannelStore from 'stores/channel_store.jsx';
 import PostStore from 'stores/post_store.jsx';
 import store from 'stores/redux_store.jsx';
 import {getSelectedPostId, getRhsState} from 'selectors/rhs';
-import {ActionTypes, Constants, RHSStates} from 'utils/constants.jsx';
+import {ActionTypes, Constants, RHSStates, PostRequestTypes} from 'utils/constants.jsx';
 import {EMOJI_PATTERN} from 'utils/emoticons.jsx';
 import * as UserAgent from 'utils/user_agent';
 
@@ -203,48 +202,48 @@ export function emitEmojiPosted(emoji) {
 const POST_INCREASE_AMOUNT = Constants.POST_CHUNK_SIZE / 2;
 
 // Returns true if there are more posts to load
-export function increasePostVisibility(channelId, focusedPostId) {
+export function loadPosts({channelId, postId, type}) {
     return async (doDispatch, doGetState) => {
-        if (doGetState().views.channel.loadingPosts[channelId]) {
-            return true;
-        }
-
         const currentPostVisibility = doGetState().views.channel.postVisibility[channelId];
 
         if (currentPostVisibility >= Constants.MAX_POST_VISIBILITY) {
             return true;
         }
 
-        doDispatch(batchActions([
-            {
-                type: ActionTypes.LOADING_POSTS,
-                data: true,
-                channelId,
-            },
-            {
-                type: ActionTypes.INCREASE_POST_VISIBILITY,
-                data: channelId,
-                amount: POST_INCREASE_AMOUNT,
-            },
-        ]));
-
-        const page = Math.floor(currentPostVisibility / POST_INCREASE_AMOUNT);
-
-        let result;
-        if (focusedPostId) {
-            result = await PostActions.getPostsBefore(channelId, focusedPostId, page, POST_INCREASE_AMOUNT)(dispatch, getState);
-        } else {
-            result = await PostActions.getPosts(channelId, page, POST_INCREASE_AMOUNT)(doDispatch, doGetState);
-        }
-        const posts = result.data;
-
         doDispatch({
-            type: ActionTypes.LOADING_POSTS,
-            data: false,
-            channelId,
+            type: ActionTypes.INCREASE_POST_VISIBILITY,
+            data: channelId,
+            amount: POST_INCREASE_AMOUNT,
         });
 
+        //always zero as we use postId for getting messages
+        const page = 0;
+
+        let result;
+        if (type === PostRequestTypes.BEFORE_ID) {
+            result = await doDispatch(PostActions.getPostsBefore(channelId, postId, page, POST_INCREASE_AMOUNT));
+        } else if (type === PostRequestTypes.AFTER_ID) {
+            result = await doDispatch(PostActions.getPostsAfter(channelId, postId, page, POST_INCREASE_AMOUNT));
+        } else {
+            result = await doDispatch(PostActions.getPosts(channelId, page, POST_INCREASE_AMOUNT));
+        }
+
+        const posts = result.data;
+
         return posts ? posts.order.length >= POST_INCREASE_AMOUNT : false;
+    };
+}
+
+// Returns true if there are more posts to load
+export function loadUnreads(channelId) {
+    return (doDispatch) => {
+        doDispatch({
+            type: ActionTypes.INCREASE_POST_VISIBILITY,
+            data: channelId,
+            amount: Constants.POST_CHUNK_SIZE,
+        });
+
+        return doDispatch(PostActions.getPostsUnread(channelId));
     };
 }
 
