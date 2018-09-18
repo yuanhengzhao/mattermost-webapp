@@ -1,6 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import React from 'react';
+
 import {stripMarkdown} from 'utils/markdown';
 
 describe('stripMarkdown | RemoveMarkdown', () => {
@@ -46,9 +48,14 @@ describe('stripMarkdown | RemoveMarkdown', () => {
             outputText: 'Multiline codespan',
         },
         {
+            description: 'codespan: multiline codespan 2',
+            inputText: 'Multiline ```function(number) {\n  return number + 1;\n}```',
+            outputText: 'Multiline function(number) {   return number + 1; }',
+        },
+        {
             description: 'codespan: language highlighting',
             inputText: '```javascript\nvar s = "JavaScript syntax highlighting";\nalert(s);\n```',
-            outputText: ' var s = "JavaScript syntax highlighting"; alert(s); ',
+            outputText: 'var s = "JavaScript syntax highlighting"; alert(s);',
         },
         {
             description: 'blockquote:',
@@ -96,6 +103,21 @@ describe('stripMarkdown | RemoveMarkdown', () => {
             outputText: 'H6 header',
         },
         {
+            description: 'heading: multiline with header and paragraph',
+            inputText: '###### H6 header\nThis is next line.\nAnother line.',
+            outputText: 'H6 header This is next line. Another line.',
+        },
+        {
+            description: 'heading: multiline with header and list items',
+            inputText: '###### H6 header\n- list item 1\n- list item 2',
+            outputText: 'H6 header list item 1 list item 2',
+        },
+        {
+            description: 'heading: multiline with header and links',
+            inputText: '###### H6 header\n[link 1](https://mattermost.com) - [link 2](https://mattermost.com)',
+            outputText: 'H6 header link 1 - link 2',
+        },
+        {
             description: 'list: 1. First ordered list item',
             inputText: '1. First ordered list item',
             outputText: 'First ordered list item',
@@ -123,7 +145,7 @@ describe('stripMarkdown | RemoveMarkdown', () => {
         {
             description: 'list: multiline',
             inputText: '1. First ordered list item\n2. Another item',
-            outputText: 'First ordered list itemAnother item',
+            outputText: 'First ordered list item Another item',
         },
         {
             description: 'tablerow:)',

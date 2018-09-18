@@ -39,9 +39,11 @@ import solarizedLightCSS from '!!file-loader?name=files/code_themes/[hash].[ext]
 
 export const SettingsTypes = {
     TYPE_TEXT: 'text',
+    TYPE_LONG_TEXT: 'longtext',
     TYPE_NUMBER: 'number',
     TYPE_COLOR: 'color',
     TYPE_BOOL: 'bool',
+    TYPE_PERMISSION: 'permission',
     TYPE_RADIO: 'radio',
     TYPE_BANNER: 'banner',
     TYPE_DROPDOWN: 'dropdown',
@@ -450,6 +452,7 @@ export const StoragePrefixes = {
 
 export const ErrorPageTypes = {
     LOCAL_STORAGE: 'local_storage',
+    OAUTH_ACCESS_DENIED: 'oauth_access_denied',
     OAUTH_MISSING_CODE: 'oauth_missing_code',
     PAGE_NOT_FOUND: 'page_not_found',
     PERMALINK_NOT_FOUND: 'permalink_not_found',
@@ -508,6 +511,13 @@ export const NotificationSections = {
     DESKTOP: 'desktop',
     PUSH: 'push',
     NONE: '',
+};
+
+export const AdvancedSections = {
+    CONTROL_SEND: 'advancedCtrlSend',
+    FORMATTING: 'formatting',
+    JOIN_LEAVE: 'joinLeave',
+    PREVIEW_FEATURES: 'advancedPreviewFeatures',
 };
 
 export const RHSStates = {
@@ -1240,6 +1250,7 @@ export const Constants = {
     MIN_TRIGGER_LENGTH: 1,
     MAX_TRIGGER_LENGTH: 128,
     MAX_SITENAME_LENGTH: 30,
+    MAX_CUSTOM_BRAND_TEXT_LENGTH: 500,
     MIN_HASHTAG_LINK_LENGTH: 3,
     CHANNEL_SCROLL_ADJUSTMENT: 100,
     EMOJI_PATH: '/static/emoji',

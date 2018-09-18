@@ -10,9 +10,7 @@ import {Route, Switch, Redirect} from 'react-router-dom';
 import AnnouncementBar from 'components/announcement_bar';
 import SystemNotice from 'components/system_notice';
 import {reloadIfServerVersionChanged} from 'actions/global_actions.jsx';
-import ClientVersionsSettings from 'components/admin_console/client_versions_settings.jsx';
 import ClusterSettings from 'components/admin_console/cluster_settings.jsx';
-import CustomBrandSettings from 'components/admin_console/custom_brand_settings.jsx';
 import CustomEmojiSettings from 'components/admin_console/custom_emoji_settings.jsx';
 import CustomGifSettings from 'components/admin_console/custom_gif_settings.jsx';
 import DataRetentionSettings from 'components/admin_console/data_retention_settings.jsx';
@@ -21,7 +19,6 @@ import ElasticsearchSettings from 'components/admin_console/elasticsearch_settin
 import EmailSettings from 'components/admin_console/email_settings.jsx';
 import GitLabSettings from 'components/admin_console/gitlab_settings.jsx';
 import MessageExportSettings from 'components/admin_console/message_export_settings';
-import OAuthSettings from 'components/admin_console/oauth_settings.jsx';
 import PasswordSettings from 'components/admin_console/password_settings.jsx';
 import PluginManagement from 'components/admin_console/plugin_management';
 import CustomPluginSettings from 'components/admin_console/custom_plugin_settings';
@@ -29,8 +26,6 @@ import UsersAndTeamsSettings from 'components/admin_console/users_and_teams_sett
 
 import SchemaAdminSettings from 'components/admin_console/schema_admin_settings';
 import PushSettings from 'components/admin_console/push_settings.jsx';
-import SamlSettings from 'components/admin_console/saml_settings.jsx';
-import SessionSettings from 'components/admin_console/session_settings.jsx';
 import DiscardChangesModal from 'components/discard_changes_modal.jsx';
 
 import AdminSidebar from './admin_sidebar';
@@ -50,70 +45,44 @@ const SCRoute = ({component: Component, extraProps, ...rest}) => ( //eslint-disa
 
 export default class AdminConsole extends React.Component {
     static propTypes = {
-
-        /*
-         * Object representing the config file
-         */
         config: PropTypes.object.isRequired,
-
-        /*
-         * Object containing config fields that have been set through environment variables
-         */
         environmentConfig: PropTypes.object,
-
-        /*
-         * Object representing the license
-         */
         license: PropTypes.object.isRequired,
-
-        /*
-         * Object from react-router
-         */
+        roles: PropTypes.object.isRequired,
         match: PropTypes.shape({
             url: PropTypes.string.isRequired,
         }).isRequired,
-
-        /*
-         * String whether to show prompt to navigate away
-         * from unsaved changes
-         */
         showNavigationPrompt: PropTypes.bool.isRequired,
-
         isCurrentUserSystemAdmin: PropTypes.bool.isRequired,
 
         actions: PropTypes.shape({
-
-            /*
-             * Function to get the config file
-             */
             getConfig: PropTypes.func.isRequired,
-
-            /*
-             * Function to get the environment config
-             */
             getEnvironmentConfig: PropTypes.func.isRequired,
-
-            /*
-             * Function to block navigation when there are unsaved changes
-             */
             setNavigationBlocked: PropTypes.func.isRequired,
-
-            /*
-             * Function to confirm navigation
-             */
             confirmNavigation: PropTypes.func.isRequired,
-
-            /*
-             * Function to cancel navigation away from unsaved changes
-             */
             cancelNavigation: PropTypes.func.isRequired,
+            loadRolesIfNeeded: PropTypes.func.isRequired,
+            editRole: PropTypes.func.isRequired,
         }).isRequired,
     }
 
     UNSAFE_componentWillMount() { // eslint-disable-line camelcase
         this.props.actions.getConfig();
         this.props.actions.getEnvironmentConfig();
+        this.props.actions.loadRolesIfNeeded(['channel_user', 'team_user', 'system_user', 'channel_admin', 'team_admin', 'system_admin']);
         reloadIfServerVersionChanged();
+    }
+
+    mainRolesLoaded(roles) {
+        return (
+            roles &&
+            roles.channel_admin &&
+            roles.channel_user &&
+            roles.team_admin &&
+            roles.team_user &&
+            roles.system_admin &&
+            roles.system_user
+        );
     }
 
     render() {
@@ -129,6 +98,10 @@ export default class AdminConsole extends React.Component {
             return (
                 <Redirect to='/'/>
             );
+        }
+
+        if (!this.mainRolesLoaded(this.props.roles)) {
+            return null;
         }
 
         if (Object.keys(config).length === 0) {
@@ -285,8 +258,11 @@ export default class AdminConsole extends React.Component {
                                     />
                                     <SCRoute
                                         path={`${props.match.url}/oauth`}
-                                        component={OAuthSettings}
-                                        extraProps={extraProps}
+                                        component={SchemaAdminSettings}
+                                        extraProps={{
+                                            ...extraProps,
+                                            schema: AdminDefinition.settings.authentication.oauth.schema,
+                                        }}
                                     />
                                     <SCRoute
                                         path={`${props.match.url}/ldap`}
@@ -298,8 +274,11 @@ export default class AdminConsole extends React.Component {
                                     />
                                     <SCRoute
                                         path={`${props.match.url}/saml`}
-                                        component={SamlSettings}
-                                        extraProps={extraProps}
+                                        component={SchemaAdminSettings}
+                                        extraProps={{
+                                            ...extraProps,
+                                            schema: AdminDefinition.settings.authentication.saml.schema,
+                                        }}
                                     />
                                     <SCRoute
                                         path={`${props.match.url}/mfa`}
@@ -340,8 +319,11 @@ export default class AdminConsole extends React.Component {
                                     />
                                     <SCRoute
                                         path={`${props.match.url}/sessions`}
-                                        component={SessionSettings}
-                                        extraProps={extraProps}
+                                        component={SchemaAdminSettings}
+                                        extraProps={{
+                                            ...extraProps,
+                                            schema: AdminDefinition.settings.security.sessions.schema,
+                                        }}
                                     />
                                     <SCRoute
                                         path={`${props.match.url}/connections`}
@@ -353,8 +335,11 @@ export default class AdminConsole extends React.Component {
                                     />
                                     <SCRoute
                                         path={`${props.match.url}/client_versions`}
-                                        component={ClientVersionsSettings}
-                                        extraProps={extraProps}
+                                        component={SchemaAdminSettings}
+                                        extraProps={{
+                                            ...extraProps,
+                                            schema: AdminDefinition.settings.security.clientVersions.schema,
+                                        }}
                                     />
                                     <Redirect to={`${props.match.url}/sign_up`}/>
                                 </Switch>
@@ -387,6 +372,8 @@ export default class AdminConsole extends React.Component {
                                         component={SchemaAdminSettings}
                                         extraProps={{
                                             ...extraProps,
+                                            roles: this.props.roles,
+                                            editRole: this.props.actions.editRole,
                                             schema: AdminDefinition.settings.integrations.custom_integrations.schema,
                                         }}
                                     />
@@ -458,8 +445,11 @@ export default class AdminConsole extends React.Component {
                                 <Switch>
                                     <SCRoute
                                         path={`${props.match.url}/custom_brand`}
-                                        component={CustomBrandSettings}
-                                        extraProps={extraProps}
+                                        component={SchemaAdminSettings}
+                                        extraProps={{
+                                            ...extraProps,
+                                            schema: AdminDefinition.settings.customization.customBrand.schema,
+                                        }}
                                     />
                                     <SCRoute
                                         path={`${props.match.url}/announcement`}

@@ -16,6 +16,8 @@ import * as Markdown from './markdown';
 const removeMarkdown = new RemoveMarkdown();
 const punctuation = XRegExp.cache('[^\\pL\\d]');
 
+const AT_MENTION_PATTERN = /\B@([a-z0-9.\-_]*)/gi;
+
 // pattern to detect the existence of a Chinese, Japanese, or Korean character in a string
 // http://stackoverflow.com/questions/15033196/using-javascript-to-check-whether-a-string-contains-japanese-characters-includi
 const cjkPattern = /[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf\uac00-\ud7a3]/;
@@ -150,7 +152,7 @@ var reEmail = XRegExp.cache('(^|[^\\pL\\d])(' + emailStartPattern + '[\\pL\\d.\\
 function autolinkEmails(text, tokens) {
     function replaceEmailWithToken(fullMatch, prefix, email) {
         const index = tokens.size;
-        const alias = `$MM_EMAIL${index}`;
+        const alias = `$MM_EMAIL${index}$`;
 
         tokens.set(alias, {
             value: `<a class="theme" href="mailto:${email}">${email}</a>`,
@@ -169,7 +171,7 @@ function autolinkEmails(text, tokens) {
 export function autolinkAtMentions(text, tokens) {
     function replaceAtMentionWithToken(fullMatch, username) {
         const index = tokens.size;
-        const alias = `$MM_ATMENTION${index}`;
+        const alias = `$MM_ATMENTION${index}$`;
 
         tokens.set(alias, {
             value: `<span data-mention="${username}">@${username}</span>`,
@@ -180,7 +182,12 @@ export function autolinkAtMentions(text, tokens) {
     }
 
     let output = text;
-    output = output.replace(/\B@([a-z0-9.\-_]*)/gi, replaceAtMentionWithToken);
+
+    let match = output.match(AT_MENTION_PATTERN);
+    while (match && match.length > 0) {
+        output = output.replace(AT_MENTION_PATTERN, replaceAtMentionWithToken);
+        match = output.match(AT_MENTION_PATTERN);
+    }
 
     return output;
 }
@@ -191,7 +198,7 @@ function autolinkChannelMentions(text, tokens, channelNamesMap, team) {
     }
     function addToken(channelName, mention, displayName) {
         const index = tokens.size;
-        const alias = `$MM_CHANNELMENTION${index}`;
+        const alias = `$MM_CHANNELMENTION${index}$`;
         let href = '#';
         if (team) {
             href = (window.basename || '') + '/' + team.name + '/channels/' + channelName;
@@ -276,7 +283,7 @@ function highlightCurrentMentions(text, tokens, mentionKeys = []) {
 
         if (mentionKeys.findIndex((key) => key.key.toLowerCase() === tokenTextLower) !== -1) {
             const index = tokens.size + newTokens.size;
-            const newAlias = `$MM_SELFMENTION${index}`;
+            const newAlias = `$MM_SELFMENTION${index}$`;
 
             newTokens.set(newAlias, {
                 value: `<span class='mention--highlight'>${alias}</span>`,
@@ -294,7 +301,7 @@ function highlightCurrentMentions(text, tokens, mentionKeys = []) {
     // look for self mentions in the text
     function replaceCurrentMentionWithToken(fullMatch, prefix, mention, suffix = '') {
         const index = tokens.size;
-        const alias = `$MM_SELFMENTION${index}`;
+        const alias = `$MM_SELFMENTION${index}$`;
 
         tokens.set(alias, {
             value: `<span class='mention--highlight'>${mention}</span>`,
@@ -329,7 +336,7 @@ function autolinkHashtags(text, tokens) {
     for (const [alias, token] of tokens) {
         if (token.originalText.lastIndexOf('#', 0) === 0) {
             const index = tokens.size + newTokens.size;
-            const newAlias = `$MM_HASHTAG${index}`;
+            const newAlias = `$MM_HASHTAG${index}$`;
 
             newTokens.set(newAlias, {
                 value: `<a class='mention-link' href='#' data-hashtag='${token.originalText}'>${token.originalText}</a>`,
@@ -349,7 +356,7 @@ function autolinkHashtags(text, tokens) {
     // look for hashtags in the text
     function replaceHashtagWithToken(fullMatch, prefix, originalText) {
         const index = tokens.size;
-        const alias = `$MM_HASHTAG${index}`;
+        const alias = `$MM_HASHTAG${index}$`;
 
         if (text.length < Constants.MIN_HASHTAG_LINK_LENGTH + 1) {
             // too short to be a hashtag
@@ -462,7 +469,7 @@ export function highlightSearchTerms(text, tokens, searchPatterns) {
 
     function replaceSearchTermWithToken(match, prefix, word) {
         const index = tokens.size;
-        const alias = `$MM_SEARCHTERM${index}`;
+        const alias = `$MM_SEARCHTERM${index}$`;
 
         tokens.set(alias, {
             value: `<span class='search-highlight'>${word}</span>`,
@@ -487,12 +494,12 @@ export function highlightSearchTerms(text, tokens, searchPatterns) {
                     term = term.substr(1);
                 }
 
-                if (alias.startsWith('$MM_HASHTAG') && originalText !== term) {
+                if (alias.startsWith('$MM_HASHTAG') && alias.endsWith('$') && originalText !== term) {
                     continue;
                 }
 
                 const index = tokens.size + newTokens.size;
-                const newAlias = `$MM_SEARCHTERM${index}`;
+                const newAlias = `$MM_SEARCHTERM${index}$`;
 
                 newTokens.set(newAlias, {
                     value: `<span class='search-highlight'>${alias}</span>`,
