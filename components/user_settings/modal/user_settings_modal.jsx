@@ -10,8 +10,9 @@ import PropTypes from 'prop-types';
 
 import ModalStore from 'stores/modal_store.jsx';
 import UserStore from 'stores/user_store.jsx';
-import Constants, {GroupUnreadChannels} from 'utils/constants.jsx';
+import Constants from 'utils/constants.jsx';
 import * as Utils from 'utils/utils.jsx';
+import {t} from 'utils/i18n';
 import ConfirmModal from '../../confirm_modal.jsx';
 import {AsyncComponent} from 'components/async_load';
 import loadUserSettings from 'bundle-loader?lazy!../user_settings.jsx';
@@ -19,39 +20,43 @@ import loadSettingsSidebar from 'bundle-loader?lazy!../../settings_sidebar.jsx';
 
 const holders = defineMessages({
     general: {
-        id: 'user.settings.modal.general',
+        id: t('user.settings.modal.general'),
         defaultMessage: 'General',
     },
     security: {
-        id: 'user.settings.modal.security',
+        id: t('user.settings.modal.security'),
         defaultMessage: 'Security',
     },
     notifications: {
-        id: 'user.settings.modal.notifications',
+        id: t('user.settings.modal.notifications'),
         defaultMessage: 'Notifications',
     },
     display: {
-        id: 'user.settings.modal.display',
+        id: t('user.settings.modal.display'),
         defaultMessage: 'Display',
     },
     sidebar: {
-        id: 'user.settings.modal.sidebar',
+        id: t('user.settings.modal.sidebar'),
         defaultMessage: 'Sidebar',
     },
     advanced: {
-        id: 'user.settings.modal.advanced',
+        id: t('user.settings.modal.advanced'),
         defaultMessage: 'Advanced',
     },
+    checkEmail: {
+        id: 'user.settings.general.checkEmail',
+        defaultMessage: 'Check your email at {email} to verify the address. Cannot find the email?',
+    },
     confirmTitle: {
-        id: 'user.settings.modal.confirmTitle',
+        id: t('user.settings.modal.confirmTitle'),
         defaultMessage: 'Discard Changes?',
     },
     confirmMsg: {
-        id: 'user.settings.modal.confirmMsg',
+        id: t('user.settings.modal.confirmMsg'),
         defaultMessage: 'You have unsaved changes, are you sure you want to discard them?',
     },
     confirmBtns: {
-        id: 'user.settings.modal.confirmBtns',
+        id: t('user.settings.modal.confirmBtns'),
         defaultMessage: 'Yes, Discard',
     },
 });
@@ -77,6 +82,18 @@ class UserSettingsModal extends React.Component {
         // If set by a child, it will be called in place of showing the regular confirm
         // modal. It will be passed a function to call on modal confirm
         this.customConfirmAction = null;
+    }
+
+    handleResend = (email) => {
+        this.setState({resendStatus: 'sending'});
+
+        this.props.actions.sendVerificationEmail(email).then(({data, error: err}) => {
+            if (data) {
+                this.setState({resendStatus: 'success'});
+            } else if (err) {
+                this.setState({resendStatus: 'failure'});
+            }
+        });
     }
 
     onUserChanged = () => {
@@ -243,10 +260,7 @@ class UserSettingsModal extends React.Component {
         tabs.push({name: 'security', uiName: formatMessage(holders.security), icon: 'icon fa fa-lock', iconTitle: Utils.localizeMessage('user.settings.security.icon', 'Security Settings Icon')});
         tabs.push({name: 'notifications', uiName: formatMessage(holders.notifications), icon: 'icon fa fa-exclamation-circle', iconTitle: Utils.localizeMessage('user.settings.notifications.icon', 'Notification Settings Icon')});
         tabs.push({name: 'display', uiName: formatMessage(holders.display), icon: 'icon fa fa-eye', iconTitle: Utils.localizeMessage('user.settings.display.icon', 'Display Settings Icon')});
-        if (this.props.closeUnusedDirectMessages ||
-            this.props.experimentalGroupUnreadChannels !== GroupUnreadChannels.DISABLED) {
-            tabs.push({name: 'sidebar', uiName: formatMessage(holders.sidebar), icon: 'icon fa fa-columns', iconTitle: Utils.localizeMessage('user.settings.sidebar.icon', 'Sidebar Settings Icon')});
-        }
+        tabs.push({name: 'sidebar', uiName: formatMessage(holders.sidebar), icon: 'icon fa fa-columns', iconTitle: Utils.localizeMessage('user.settings.sidebar.icon', 'Sidebar Settings Icon')});
         tabs.push({name: 'advanced', uiName: formatMessage(holders.advanced), icon: 'icon fa fa-list-alt', iconTitle: Utils.localizeMessage('user.settings.advance.icon', 'Advanced Settings Icon')});
 
         return (
@@ -318,6 +332,11 @@ UserSettingsModal.propTypes = {
     intl: intlShape.isRequired,
     closeUnusedDirectMessages: PropTypes.bool,
     experimentalGroupUnreadChannels: PropTypes.string,
+    sendEmailNotifications: PropTypes.bool,
+    requireEmailVerification: PropTypes.bool,
+    actions: PropTypes.shape({
+        sendVerificationEmail: PropTypes.func.isRequred,
+    }).isRequired,
 };
 
 export default injectIntl(UserSettingsModal);

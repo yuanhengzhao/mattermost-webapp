@@ -121,7 +121,7 @@ export default class SchemaAdminSettings extends React.Component {
         }
 
         if (this.state.saveNeeded === 'both' || this.state.saveNeeded === 'config') {
-            this.doSubmit(null, this.getStateFromConfig);
+            this.doSubmit(null, SchemaAdminSettings.getStateFromConfig);
         } else {
             this.setState({
                 saving: false,
@@ -324,19 +324,17 @@ export default class SchemaAdminSettings extends React.Component {
     }
 
     isDisabled = (setting) => {
-        if (!setting.isDisabled || typeof setting.isDisabled !== 'function') {
-            return false;
+        if (typeof setting.isDisabled === 'function') {
+            return setting.isDisabled(this.props.config, this.state, this.props.license);
         }
-
-        return setting.isDisabled(this.props.config, this.state, this.props.license);
+        return Boolean(setting.isDisabled);
     }
 
     isHidden = (setting) => {
-        if (!setting.isHidden || typeof setting.isHidden !== 'function') {
-            return false;
+        if (typeof setting.isHidden === 'function') {
+            return setting.isHidden(this.props.config, this.state, this.props.license);
         }
-
-        return setting.isHidden(this.props.config, this.state, this.props.license);
+        return Boolean(setting.isHidden);
     }
 
     buildButtonSetting = (setting) => {

@@ -7,6 +7,7 @@ exports[`components/TextBox should match snapshot with required props 1`] = `
   <SuggestionBox
     className="form-control custom-textarea"
     completeOnTab={true}
+    containerClass=""
     id="someid"
     inputComponent={[Function]}
     isRHS={false}
@@ -28,6 +29,7 @@ exports[`components/TextBox should match snapshot with required props 1`] = `
           "disableDispatches": false,
           "latestComplete": true,
           "latestPrefix": "",
+          "requestStarted": false,
         },
         ChannelMentionProvider {
           "disableDispatches": false,
@@ -36,11 +38,14 @@ exports[`components/TextBox should match snapshot with required props 1`] = `
           "lastPrefixWithNoResults": "",
           "latestComplete": true,
           "latestPrefix": "",
+          "requestStarted": false,
         },
         EmoticonProvider {},
       ]
     }
     renderDividers={true}
+    renderNoResults={false}
+    replaceAllInputOnSelect={false}
     requiredCharacters={1}
     spellCheck="true"
     style={
@@ -135,6 +140,7 @@ exports[`components/TextBox should throw error when new property is too long 1`]
   <SuggestionBox
     className="form-control custom-textarea"
     completeOnTab={true}
+    containerClass=""
     id="someid"
     inputComponent={[Function]}
     isRHS={false}
@@ -156,6 +162,7 @@ exports[`components/TextBox should throw error when new property is too long 1`]
           "disableDispatches": false,
           "latestComplete": true,
           "latestPrefix": "",
+          "requestStarted": false,
         },
         ChannelMentionProvider {
           "disableDispatches": false,
@@ -164,11 +171,14 @@ exports[`components/TextBox should throw error when new property is too long 1`]
           "lastPrefixWithNoResults": "",
           "latestComplete": true,
           "latestPrefix": "",
+          "requestStarted": false,
         },
         EmoticonProvider {},
       ]
     }
     renderDividers={true}
+    renderNoResults={false}
+    replaceAllInputOnSelect={false}
     requiredCharacters={1}
     spellCheck="true"
     style={
@@ -263,6 +273,7 @@ exports[`components/TextBox should throw error when value is too long 1`] = `
   <SuggestionBox
     className="form-control custom-textarea"
     completeOnTab={true}
+    containerClass=""
     id="someid"
     inputComponent={[Function]}
     isRHS={false}
@@ -284,6 +295,7 @@ exports[`components/TextBox should throw error when value is too long 1`] = `
           "disableDispatches": false,
           "latestComplete": true,
           "latestPrefix": "",
+          "requestStarted": false,
         },
         ChannelMentionProvider {
           "disableDispatches": false,
@@ -292,11 +304,14 @@ exports[`components/TextBox should throw error when value is too long 1`] = `
           "lastPrefixWithNoResults": "",
           "latestComplete": true,
           "latestPrefix": "",
+          "requestStarted": false,
         },
         EmoticonProvider {},
       ]
     }
     renderDividers={true}
+    renderNoResults={false}
+    replaceAllInputOnSelect={false}
     requiredCharacters={1}
     spellCheck="true"
     style={

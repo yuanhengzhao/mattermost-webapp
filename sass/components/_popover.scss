@@ -24,6 +24,24 @@
         margin-top: 10px;
     }
 
+    ul,
+    ol {
+        font-size: 13.5px;
+        margin-bottom: .11em;
+        margin-top: 3px;
+        padding-left: 22px;
+    }
+
+    ul + p,
+    ol + p {
+        margin-top: .6em;
+    }
+
+    p + ul,
+    p + ol {
+        margin-top: .6em;
+    }
+
     .popover-title {
         @include border-radius(0);
         background: alpha-color($black, .05);
@@ -201,11 +219,12 @@
     .popover-content {
         max-height: 500px;
         overflow: auto;
-        padding: 3px 13px;
+        padding: 15px;
     }
 
     h4 {
-        font-size: 1em;
+        font-size: 1.4rem;
+        margin-top: 0;
     }
 
     ul {

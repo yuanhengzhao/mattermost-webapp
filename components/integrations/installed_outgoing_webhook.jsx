@@ -6,6 +6,9 @@ import React from 'react';
 import {FormattedMessage} from 'react-intl';
 import {Link} from 'react-router-dom';
 
+import {t} from 'utils/i18n';
+import CopyText from 'components/copy_text.jsx';
+
 import DeleteIntegration from './delete_integration.jsx';
 
 export default class InstalledOutgoingWebhook extends React.PureComponent {
@@ -212,7 +215,7 @@ export default class InstalledOutgoingWebhook extends React.PureComponent {
                     </Link>
                     {' - '}
                     <DeleteIntegration
-                        messageId='installed_outgoing_webhooks.delete.confirm'
+                        messageId={t('installed_outgoing_webhooks.delete.confirm')}
                         onDelete={this.handleDelete}
                     />
                 </div>
@@ -259,6 +262,9 @@ export default class InstalledOutgoingWebhook extends React.PureComponent {
                                 values={{
                                     token: outgoingWebhook.token,
                                 }}
+                            />
+                            <CopyText
+                                value={outgoingWebhook.token}
                             />
                         </span>
                     </div>

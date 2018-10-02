@@ -5,6 +5,7 @@ import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {FormattedMessage} from 'react-intl';
+import {OverlayTrigger, Tooltip} from 'react-bootstrap';
 
 import {showGetPostLinkModal} from 'actions/global_actions.jsx';
 
@@ -13,6 +14,7 @@ import DeletePostModal from 'components/delete_post_modal';
 import DelayedAction from 'utils/delayed_action.jsx';
 import * as PostUtils from 'utils/post_utils.jsx';
 import * as Utils from 'utils/utils.jsx';
+import {t} from 'utils/i18n';
 
 import Pluggable from 'plugins/pluggable';
 
@@ -226,7 +228,7 @@ export default class DotMenu extends Component {
                         key={'pin'}
                         menuItemText={
                             <FormattedMessage
-                                id={this.props.post.is_pinned ? 'post_info.unpin' : 'post_info.pin'}
+                                id={this.props.post.is_pinned ? t('post_info.unpin') : t('post_info.pin')}
                                 defaultMessage={'Pin'}
                             />
                         }
@@ -288,19 +290,39 @@ export default class DotMenu extends Component {
             return null;
         }
 
+        const tooltip = (
+            <Tooltip
+                id='dotmenu-icon-tooltip'
+                className='hidden-xs'
+            >
+                <FormattedMessage
+                    id='post_info.dot_menu.tooltip.more_actions'
+                    defaultMessage='More Actions'
+                />
+            </Tooltip>
+        );
+
         return (
             <div
                 className='dropdown'
                 ref='dotMenu'
             >
                 <div id={this.dotMenuId}>
-                    <button
-                        ref='dropdownToggle'
-                        className='dropdown-toggle post__dropdown color--link style--none'
-                        type='button'
-                        data-toggle='dropdown'
-                        aria-expanded='false'
-                    />
+                    <OverlayTrigger
+                        className='hidden-xs'
+                        delayShow={500}
+                        placement='top'
+                        overlay={tooltip}
+                        rootClose={true}
+                    >
+                        <button
+                            ref='dropdownToggle'
+                            className='dropdown-toggle post__dropdown color--link style--none'
+                            type='button'
+                            data-toggle='dropdown'
+                            aria-expanded='false'
+                        />
+                    </OverlayTrigger>
                     <div className='dropdown-menu__content'>
                         <ul
                             ref='dropdown'

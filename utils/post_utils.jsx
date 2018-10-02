@@ -14,6 +14,7 @@ import Constants from 'utils/constants.jsx';
 import {formatWithRenderer} from 'utils/markdown';
 import MentionableRenderer from 'utils/markdown/mentionable_renderer';
 import * as Utils from 'utils/utils.jsx';
+import {isMobile} from 'utils/user_agent.jsx';
 
 export function isSystemMessage(post) {
     return Boolean(post.type && (post.type.lastIndexOf(Constants.SYSTEM_MESSAGE_PREFIX) === 0));
@@ -128,4 +129,100 @@ export function containsAtChannel(text) {
     const mentionableText = formatWithRenderer(text, new MentionableRenderer());
 
     return (/\B@(all|channel)\b/i).test(mentionableText);
+}
+
+export function shouldFocusMainTextbox(e, activeElement) {
+    if (!e) {
+        return false;
+    }
+
+    // Do not focus if we're currently focused on a textarea or input
+    const keepFocusTags = ['TEXTAREA', 'INPUT'];
+    if (!activeElement || keepFocusTags.includes(activeElement.tagName)) {
+        return false;
+    }
+
+    // Focus if it is an attempted paste
+    if (Utils.cmdOrCtrlPressed(e) && Utils.isKeyPressed(e, Constants.KeyCodes.V)) {
+        return true;
+    }
+
+    // Do not focus if a modifier key is pressed
+    if (e.ctrlKey || e.metaKey || e.altKey) {
+        return false;
+    }
+
+    // Do not focus if the key is undefined or null
+    if (e.key == null) {
+        return false;
+    }
+
+    // Do not focus for non-character or non-number keys
+    if (e.key.length !== 1 || !e.key.match(/./)) {
+        return false;
+    }
+
+    return true;
+}
+
+function allowSendingAMessage(message) {
+    const splitMessage = message.split('\n');
+    let lastLineMessage = splitMessage[splitMessage.length - 1];
+
+    if (splitMessage.length > 1 && !lastLineMessage.includes('```')) {
+        while (splitMessage.length > 1 && !lastLineMessage.includes('```')) {
+            if (lastLineMessage.trim() !== '') {
+                return {
+                    allowSending: true,
+                    message: message.endsWith('\n') ? message.concat('```') : message.concat('\n```'),
+                    withClosedCodeBlock: true,
+                };
+            }
+
+            splitMessage.splice(splitMessage.length - 1);
+            lastLineMessage = splitMessage[splitMessage.length - 1];
+        }
+    }
+
+    return {allowSending: false};
+}
+
+function sendOnCtrlEnter(message, ctrlOrMetaKeyPressed, isSendMessageOnCtrlEnter) {
+    const match = message.match(Constants.TRIPLE_BACK_TICKS);
+    if (isSendMessageOnCtrlEnter && ctrlOrMetaKeyPressed && (!match || match.length % 2 === 0)) {
+        return {allowSending: true};
+    } else if (!isSendMessageOnCtrlEnter && (!match || match.length % 2 === 0)) {
+        return {allowSending: true};
+    } else if (ctrlOrMetaKeyPressed && match && match.length % 2 !== 0) {
+        return allowSendingAMessage(message);
+    }
+
+    return {allowSending: false};
+}
+
+export function postMessageOnKeyPress(event, message, sendMessageOnCtrlEnter, sendCodeBlockOnCtrlEnter) {
+    if (
+        !event ||
+        message.trim() === '' ||
+        isMobile() ||
+        !Utils.isKeyPressed(event, Constants.KeyCodes.ENTER) ||
+        event.shiftKey ||
+        event.altKey
+    ) {
+        return {allowSending: false};
+    }
+
+    if (!(sendMessageOnCtrlEnter || sendCodeBlockOnCtrlEnter)) {
+        return {allowSending: true};
+    }
+
+    const ctrlOrMetaKeyPressed = event.ctrlKey || event.metaKey;
+
+    if (sendMessageOnCtrlEnter) {
+        return sendOnCtrlEnter(message, ctrlOrMetaKeyPressed, true);
+    } else if (sendCodeBlockOnCtrlEnter) {
+        return sendOnCtrlEnter(message, ctrlOrMetaKeyPressed, false);
+    }
+
+    return {allowSending: false};
 }

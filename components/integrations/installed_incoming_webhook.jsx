@@ -7,6 +7,9 @@ import {FormattedMessage} from 'react-intl';
 import {Link} from 'react-router-dom';
 
 import {getSiteURL} from 'utils/url.jsx';
+import {t} from 'utils/i18n';
+
+import CopyText from 'components/copy_text.jsx';
 
 import DeleteIntegration from './delete_integration.jsx';
 
@@ -124,12 +127,14 @@ export default class InstalledIncomingWebhook extends React.PureComponent {
                     </Link>
                     {' - '}
                     <DeleteIntegration
-                        messageId='installed_incoming_webhooks.delete.confirm'
+                        messageId={t('installed_incoming_webhooks.delete.confirm')}
                         onDelete={this.handleDelete}
                     />
                 </div>
             );
         }
+
+        const incomingWebhookId = getSiteURL() + '/hooks/' + incomingWebhook.id;
 
         return (
             <div className='backstage-list__item'>
@@ -146,9 +151,14 @@ export default class InstalledIncomingWebhook extends React.PureComponent {
                                 id='installed_integrations.url'
                                 defaultMessage='URL: {url}'
                                 values={{
-                                    url: getSiteURL() + '/hooks/' + incomingWebhook.id,
+                                    url: incomingWebhookId,
                                 }}
                             />
+                            <span>
+                                <CopyText
+                                    value={incomingWebhookId}
+                                />
+                            </span>
                         </span>
                     </div>
                     <div className='item-details__row'>

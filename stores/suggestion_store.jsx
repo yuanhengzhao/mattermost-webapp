@@ -89,6 +89,7 @@ class SuggestionStore extends EventEmitter {
 
     registerSuggestionBox(id) {
         this.suggestions.set(id, {
+            cleared: true,
             pretext: '',
             matchedPretext: [],
             terms: [],
@@ -105,6 +106,7 @@ class SuggestionStore extends EventEmitter {
     clearSuggestions(id) {
         const suggestion = this.getSuggestions(id);
 
+        suggestion.cleared = true;
         suggestion.matchedPretext = [];
         suggestion.terms = [];
         suggestion.items = [];
@@ -121,8 +123,13 @@ class SuggestionStore extends EventEmitter {
         return this.suggestions.has(id);
     }
 
+    // hasSuggestions returns true if the given suggestion box has selectable items.
+    //
+    // This adopts a convention introduced by a particular suggestion provider tagging a loading
+    // item with a flag indicating same. Ideally, this would be modelled as a concept within the
+    // suggestion store itself.
     hasSuggestions(id) {
-        return this.getSuggestions(id).terms.length > 0;
+        return this.getSuggestions(id).items.some((item) => !item.loading);
     }
 
     setPretext(id, pretext) {
@@ -134,6 +141,7 @@ class SuggestionStore extends EventEmitter {
     addSuggestion(id, term, item, component, matchedPretext) {
         const suggestion = this.getSuggestions(id);
 
+        suggestion.cleared = false;
         suggestion.terms.push(term);
         suggestion.items.push(item);
         suggestion.components.push(component);
@@ -143,6 +151,7 @@ class SuggestionStore extends EventEmitter {
     addSuggestions(id, terms, items, component, matchedPretext) {
         const suggestion = this.getSuggestions(id);
 
+        suggestion.cleared = false;
         suggestion.terms.push(...terms);
         suggestion.items.push(...items);
 

@@ -23,12 +23,12 @@ import {
     addReaction,
     removeReaction,
 } from 'mattermost-redux/actions/posts';
-import {Posts} from 'mattermost-redux/constants';
+import {Posts, Preferences as PreferencesRedux} from 'mattermost-redux/constants';
 
 import {emitUserPostedEvent, postListScrollChangeToBottom} from 'actions/global_actions.jsx';
 import {createPost, setEditingPost} from 'actions/post_actions.jsx';
 import {selectPostFromRightHandSideSearchByPostId} from 'actions/views/rhs';
-import {getPostDraft} from 'selectors/rhs';
+import {getPostDraft, getIsRhsExpanded} from 'selectors/rhs';
 import {getCurrentLocale} from 'selectors/i18n';
 import {setGlobalItem, actionOnGlobalItemsWithPrefix} from 'actions/storage';
 import {openModal} from 'actions/views/modals';
@@ -60,6 +60,7 @@ function mapStateToProps() {
             currentChannel,
             currentChannelMembersCount,
             currentUserId,
+            codeBlockOnCtrlEnter: getBool(state, PreferencesRedux.CATEGORY_ADVANCED_SETTINGS, 'code_block_ctrl_enter', true),
             ctrlSend: getBool(state, Preferences.CATEGORY_ADVANCED_SETTINGS, 'send_on_ctrl_enter'),
             fullWidthTextBox: get(state, Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.CHANNEL_DISPLAY_MODE, Preferences.CHANNEL_DISPLAY_MODE_DEFAULT) === Preferences.CHANNEL_DISPLAY_MODE_FULL_SCREEN,
             showTutorialTip: enableTutorial && tutorialStep === TutorialSteps.POST_POPOVER,
@@ -77,6 +78,7 @@ function mapStateToProps() {
             enableConfirmNotificationsToChannel,
             maxPostSize: parseInt(config.MaxPostSize, 10) || Constants.DEFAULT_CHARACTER_LIMIT,
             userIsOutOfOffice,
+            rhsExpanded: getIsRhsExpanded(state),
         };
     };
 }

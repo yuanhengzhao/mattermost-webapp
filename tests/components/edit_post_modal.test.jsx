@@ -199,7 +199,7 @@ describe('components/EditPostModal', () => {
         const options = new ReactRouterEnzymeContext();
         const wrapper = mountWithIntl(createEditPost(), options.get());
         const instance = wrapper.instance();
-        const ref = wrapper.ref('editbox');
+        const ref = instance.editbox;
         ref.focus = jest.fn();
         ref.recalculateSize = jest.fn();
         expect(ref.focus).not.toBeCalled();
@@ -213,7 +213,7 @@ describe('components/EditPostModal', () => {
         const options = new ReactRouterEnzymeContext();
         const wrapper = mountWithIntl(createEditPost(), options.get());
         const instance = wrapper.instance();
-        const ref = wrapper.ref('editbox');
+        const ref = instance.editbox;
         ref.hidePreview = jest.fn();
         expect(ref.hidePreview).not.toBeCalled();
         instance.handleExit();
@@ -411,5 +411,19 @@ describe('components/EditPostModal', () => {
         instance.handleEditKeyPress({key: Constants.KeyCodes.ENTER[0], ctrlKey: true, preventDefault, shiftKey: false, altKey: false});
         expect(instance.handleEdit).toBeCalled();
         expect(preventDefault).toBeCalled();
+    });
+
+    it('should handle the escape key manually to hide the modal', () => {
+        const options = new ReactRouterEnzymeContext();
+        var wrapper = shallow(createEditPost({ctrlSend: true}), {context: options.get()});
+        var instance = wrapper.instance();
+        instance.handleHide = jest.fn();
+        instance.handleExit = jest.fn();
+
+        instance.handleKeyDown({keyCode: 1});
+        expect(instance.handleHide).not.toBeCalled();
+
+        instance.handleKeyDown({key: Constants.KeyCodes.ESCAPE[0], keyCode: Constants.KeyCodes.ESCAPE[1]});
+        expect(instance.handleHide).toBeCalled();
     });
 });

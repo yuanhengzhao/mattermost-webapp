@@ -13,7 +13,7 @@ import {withRouter} from 'react-router-dom';
 import {getDirectTeammate} from 'utils/utils.jsx';
 import {TutorialSteps, Preferences, Constants} from 'utils/constants.jsx';
 
-import {getLastViewedChannelName} from 'selectors/storage';
+import {getLastViewedChannelName} from 'selectors/local_storage';
 
 import ChannelView from './channel_view.jsx';
 
@@ -37,6 +37,7 @@ function makeMapStateToProps() {
         const enableTutorial = config.EnableTutorial === 'true';
         const tutorialStep = getInt(state, Preferences.TUTORIAL_STEP, getCurrentUserId(state), TutorialSteps.FINISHED);
         const team = getTeamByName(state, ownProps.match.params.team);
+        const viewArchivedChannels = config.ExperimentalViewArchivedChannels === 'true';
         const channel = getChannel(state, {id: channelId});
         if (channel) {
             if (channel.type !== Constants.DM_CHANNEL && channel.type !== Constants.GM_CHANNEL) {
@@ -68,6 +69,7 @@ function makeMapStateToProps() {
             showTutorial: enableTutorial && tutorialStep <= TutorialSteps.INTRO_SCREENS,
             channelIsArchived: channel ? channel.delete_at !== 0 : false,
             lastViewedChannelName,
+            viewArchivedChannels,
         };
     };
 }

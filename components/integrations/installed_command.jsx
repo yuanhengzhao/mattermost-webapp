@@ -6,6 +6,9 @@ import React from 'react';
 import {FormattedMessage} from 'react-intl';
 import {Link} from 'react-router-dom';
 
+import {t} from 'utils/i18n';
+import CopyText from '../copy_text.jsx';
+
 import DeleteIntegration from './delete_integration.jsx';
 
 export default class InstalledCommand extends React.PureComponent {
@@ -126,12 +129,14 @@ export default class InstalledCommand extends React.PureComponent {
                     </Link>
                     {' - '}
                     <DeleteIntegration
-                        messageId='installed_commands.delete.confirm'
+                        messageId={t('installed_commands.delete.confirm')}
                         onDelete={this.handleDelete}
                     />
                 </div>
             );
         }
+
+        const commandToken = command.token;
 
         return (
             <div className='backstage-list__item'>
@@ -151,8 +156,11 @@ export default class InstalledCommand extends React.PureComponent {
                                 id='installed_integrations.token'
                                 defaultMessage='Token: {token}'
                                 values={{
-                                    token: command.token,
+                                    token: commandToken,
                                 }}
+                            />
+                            <CopyText
+                                value={commandToken}
                             />
                         </span>
                     </div>

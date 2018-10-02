@@ -25,6 +25,7 @@ export default class SidebarChannelButtonOrLink extends React.PureComponent {
         ]).isRequired,
         channelStatus: PropTypes.string,
         handleClose: PropTypes.func,
+        hasDraft: PropTypes.bool.isRequired,
         badge: PropTypes.bool,
         membersCount: PropTypes.number.isRequired,
         unreadMentions: PropTypes.number,
@@ -54,12 +55,15 @@ export default class SidebarChannelButtonOrLink extends React.PureComponent {
                 <SidebarChannelButtonOrLinkIcon
                     channelStatus={this.props.channelStatus}
                     channelType={this.props.channelType}
+                    channelIsArchived={this.props.channelIsArchived}
+                    hasDraft={this.props.hasDraft}
                     membersCount={this.props.membersCount}
                     teammateId={this.props.teammateId}
                     teammateDeletedAt={this.props.teammateDeletedAt}
-                    channelIsArchived={this.props.channelIsArchived}
                 />
-                <span className='sidebar-item__name'>{this.props.displayName}</span>
+                <span className='sidebar-item__name'>
+                    <span>{this.props.displayName}</span>
+                </span>
                 {badge}
                 <SidebarChannelButtonOrLinkCloseButton
                     handleClose={this.props.handleClose}

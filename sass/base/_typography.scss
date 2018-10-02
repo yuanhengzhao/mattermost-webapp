@@ -44,6 +44,10 @@ body {
     white-space: nowrap;
 }
 
+.whitespace--normal {
+    white-space: normal;
+}
+
 .overflow--ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -147,5 +151,5 @@ body {
 }
 
 .app__body.font--open_sans {
-    font-family: 'Open Sans', 'sans-serif';
+    font-family: 'Open Sans', sans-serif;
 }

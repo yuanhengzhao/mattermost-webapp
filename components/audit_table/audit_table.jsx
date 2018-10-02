@@ -5,209 +5,208 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {defineMessages, FormattedDate, FormattedMessage, FormattedTime, injectIntl, intlShape} from 'react-intl';
 
-import ChannelStore from 'stores/channel_store.jsx';
-import UserStore from 'stores/user_store.jsx';
-import * as Utils from 'utils/utils.jsx';
+import {getDirectTeammate, isSystemAdmin, toTitleCase} from 'utils/utils.jsx';
+import {t} from 'utils/i18n';
 
 const holders = defineMessages({
     sessionRevoked: {
-        id: 'audit_table.sessionRevoked',
+        id: t('audit_table.sessionRevoked'),
         defaultMessage: 'The session with id {sessionId} was revoked',
     },
     channelCreated: {
-        id: 'audit_table.channelCreated',
+        id: t('audit_table.channelCreated'),
         defaultMessage: 'Created the {channelName} channel',
     },
     establishedDM: {
-        id: 'audit_table.establishedDM',
+        id: t('audit_table.establishedDM'),
         defaultMessage: 'Established a direct message channel with {username}',
     },
     nameUpdated: {
-        id: 'audit_table.nameUpdated',
+        id: t('audit_table.nameUpdated'),
         defaultMessage: 'Updated the {channelName} channel name',
     },
     headerUpdated: {
-        id: 'audit_table.headerUpdated',
+        id: t('audit_table.headerUpdated'),
         defaultMessage: 'Updated the {channelName} channel header',
     },
     channelDeleted: {
-        id: 'audit_table.channelDeleted',
+        id: t('audit_table.channelDeleted'),
         defaultMessage: 'Archived the channel with the URL {url}',
     },
     userAdded: {
-        id: 'audit_table.userAdded',
+        id: t('audit_table.userAdded'),
         defaultMessage: 'Added {username} to the {channelName} channel',
     },
     userRemoved: {
-        id: 'audit_table.userRemoved',
+        id: t('audit_table.userRemoved'),
         defaultMessage: 'Removed {username} to the {channelName} channel',
     },
     attemptedRegisterApp: {
-        id: 'audit_table.attemptedRegisterApp',
+        id: t('audit_table.attemptedRegisterApp'),
         defaultMessage: 'Attempted to register a new OAuth Application with ID {id}',
     },
     attemptedAllowOAuthAccess: {
-        id: 'audit_table.attemptedAllowOAuthAccess',
+        id: t('audit_table.attemptedAllowOAuthAccess'),
         defaultMessage: 'Attempted to allow a new OAuth service access',
     },
     successfullOAuthAccess: {
-        id: 'audit_table.successfullOAuthAccess',
+        id: t('audit_table.successfullOAuthAccess'),
         defaultMessage: 'Successfully gave a new OAuth service access',
     },
     failedOAuthAccess: {
-        id: 'audit_table.failedOAuthAccess',
+        id: t('audit_table.failedOAuthAccess'),
         defaultMessage: 'Failed to allow a new OAuth service access - the redirect URI did not match the previously registered callback',
     },
     attemptedOAuthToken: {
-        id: 'audit_table.attemptedOAuthToken',
+        id: t('audit_table.attemptedOAuthToken'),
         defaultMessage: 'Attempted to get an OAuth access token',
     },
     successfullOAuthToken: {
-        id: 'audit_table.successfullOAuthToken',
+        id: t('audit_table.successfullOAuthToken'),
         defaultMessage: 'Successfully added a new OAuth service',
     },
     oauthTokenFailed: {
-        id: 'audit_table.oauthTokenFailed',
+        id: t('audit_table.oauthTokenFailed'),
         defaultMessage: 'Failed to get an OAuth access token - {token}',
     },
     attemptedLogin: {
-        id: 'audit_table.attemptedLogin',
+        id: t('audit_table.attemptedLogin'),
         defaultMessage: 'Attempted to login',
     },
     authenticated: {
-        id: 'audit_table.authenticated',
+        id: t('audit_table.authenticated'),
         defauleMessage: 'Successfully authenticated',
     },
     successfullLogin: {
-        id: 'audit_table.successfullLogin',
+        id: t('audit_table.successfullLogin'),
         defaultMessage: 'Successfully logged in',
     },
     failedLogin: {
-        id: 'audit_table.failedLogin',
+        id: t('audit_table.failedLogin'),
         defaultMessage: 'FAILED login attempt',
     },
     updatePicture: {
-        id: 'audit_table.updatePicture',
+        id: t('audit_table.updatePicture'),
         defaultMessage: 'Updated your profile picture',
     },
     updateGeneral: {
-        id: 'audit_table.updateGeneral',
+        id: t('audit_table.updateGeneral'),
         defaultMessage: 'Updated the general settings of your account',
     },
     attemptedPassword: {
-        id: 'audit_table.attemptedPassword',
+        id: t('audit_table.attemptedPassword'),
         defaultMessage: 'Attempted to change password',
     },
     successfullPassword: {
-        id: 'audit_table.successfullPassword',
+        id: t('audit_table.successfullPassword'),
         defaultMessage: 'Successfully changed password',
     },
     failedPassword: {
-        id: 'audit_table.failedPassword',
+        id: t('audit_table.failedPassword'),
         defaultMessage: 'Failed to change password - tried to update user password who was logged in through OAuth',
     },
     updatedRol: {
-        id: 'audit_table.updatedRol',
+        id: t('audit_table.updatedRol'),
         defaultMessage: 'Updated user role(s) to ',
     },
     member: {
-        id: 'audit_table.member',
+        id: t('audit_table.member'),
         defaultMessage: 'member',
     },
     accountActive: {
-        id: 'audit_table.accountActive',
+        id: t('audit_table.accountActive'),
         defaultMessage: 'Account activated',
     },
     accountInactive: {
-        id: 'audit_table.accountInactive',
+        id: t('audit_table.accountInactive'),
         defaultMessage: 'Account deactivated',
     },
     by: {
-        id: 'audit_table.by',
+        id: t('audit_table.by'),
         defaultMessage: ' by {username}',
     },
     byAdmin: {
-        id: 'audit_table.byAdmin',
+        id: t('audit_table.byAdmin'),
         defaultMessage: ' by an admin',
     },
     sentEmail: {
-        id: 'audit_table.sentEmail',
+        id: t('audit_table.sentEmail'),
         defaultMessage: 'Sent an email to {email} to reset your password',
     },
     attemptedReset: {
-        id: 'audit_table.attemptedReset',
+        id: t('audit_table.attemptedReset'),
         defaultMessage: 'Attempted to reset password',
     },
     successfullReset: {
-        id: 'audit_table.successfullReset',
+        id: t('audit_table.successfullReset'),
         defaultMessage: 'Successfully reset password',
     },
     updateGlobalNotifications: {
-        id: 'audit_table.updateGlobalNotifications',
+        id: t('audit_table.updateGlobalNotifications'),
         defaultMessage: 'Updated your global notification settings',
     },
     attemptedWebhookCreate: {
-        id: 'audit_table.attemptedWebhookCreate',
+        id: t('audit_table.attemptedWebhookCreate'),
         defaultMessage: 'Attempted to create a webhook',
     },
     succcessfullWebhookCreate: {
-        id: 'audit_table.successfullWebhookCreate',
+        id: t('audit_table.successfullWebhookCreate'),
         defaultMessage: 'Successfully created a webhook',
     },
     failedWebhookCreate: {
-        id: 'audit_table.failedWebhookCreate',
+        id: t('audit_table.failedWebhookCreate'),
         defaultMessage: 'Failed to create a webhook - bad channel permissions',
     },
     attemptedWebhookDelete: {
-        id: 'audit_table.attemptedWebhookDelete',
+        id: t('audit_table.attemptedWebhookDelete'),
         defaultMessage: 'Attempted to delete a webhook',
     },
     successfullWebhookDelete: {
-        id: 'audit_table.successfullWebhookDelete',
+        id: t('audit_table.successfullWebhookDelete'),
         defaultMessage: 'Successfully deleted a webhook',
     },
     failedWebhookDelete: {
-        id: 'audit_table.failedWebhookDelete',
+        id: t('audit_table.failedWebhookDelete'),
         defaultMessage: 'Failed to delete a webhook - inappropriate conditions',
     },
     logout: {
-        id: 'audit_table.logout',
+        id: t('audit_table.logout'),
         defaultMessage: 'Logged out of your account',
     },
     verified: {
-        id: 'audit_table.verified',
+        id: t('audit_table.verified'),
         defaultMessage: 'Successfully verified your email address',
     },
     revokedAll: {
-        id: 'audit_table.revokedAll',
+        id: t('audit_table.revokedAll'),
         defaultMessage: 'Revoked all current sessions for the team',
     },
     loginAttempt: {
-        id: 'audit_table.loginAttempt',
+        id: t('audit_table.loginAttempt'),
         defaultMessage: ' (Login attempt)',
     },
     loginFailure: {
-        id: 'audit_table.loginFailure',
+        id: t('audit_table.loginFailure'),
         defaultMessage: ' (Login failure)',
     },
     attemptedLicenseAdd: {
-        id: 'audit_table.attemptedLicenseAdd',
+        id: t('audit_table.attemptedLicenseAdd'),
         defaultMessage: 'Attempted to add new license',
     },
     successfullLicenseAdd: {
-        id: 'audit_table.successfullLicenseAdd',
+        id: t('audit_table.successfullLicenseAdd'),
         defaultMessage: 'Successfully added new license',
     },
     failedExpiredLicenseAdd: {
-        id: 'audit_table.failedExpiredLicenseAdd',
+        id: t('audit_table.failedExpiredLicenseAdd'),
         defaultMessage: 'Failed to add a new license as it has either expired or not yet been started',
     },
     failedInvalidLicenseAdd: {
-        id: 'audit_table.failedInvalidLicenseAdd',
+        id: t('audit_table.failedInvalidLicenseAdd'),
         defaultMessage: 'Failed to add an invalid license',
     },
     licenseRemoved: {
-        id: 'audit_table.licenseRemoved',
+        id: t('audit_table.licenseRemoved'),
         defaultMessage: 'Successfully removed a license',
     },
 });
@@ -218,16 +217,13 @@ function AuditTable(props) {
     const {formatMessage} = props.intl;
     for (var i = 0; i < props.audits.length; i++) {
         const audit = props.audits[i];
-        const auditInfo = formatAuditInfo(audit, formatMessage);
+        const auditInfo = formatAuditInfo(audit, formatMessage, props.currentUser, props.getByName, props.getUser);
 
         let uContent;
         if (props.showUserId) {
-            var profile = UserStore.getProfile(auditInfo.userId);
-            if (profile) {
-                uContent = <td className='word-break--all'>{profile.email}</td>;
-            } else {
-                uContent = <td className='word-break--all'>{auditInfo.userId}</td>;
-            }
+            const profile = props.getUser(auditInfo.userId);
+            const data = profile ? profile.email : auditInfo.userId;
+            uContent = <td className='word-break--all'>{data}</td>;
         }
 
         let iContent;
@@ -330,11 +326,14 @@ AuditTable.propTypes = {
     showUserId: PropTypes.bool,
     showIp: PropTypes.bool,
     showSession: PropTypes.bool,
+    currentUser: PropTypes.object.isRequired,
+    getUser: PropTypes.func.isRequired,
+    getByName: PropTypes.func.isRequired,
 };
 
 export default injectIntl(AuditTable);
 
-export function formatAuditInfo(audit, formatMessage) {
+export function formatAuditInfo(audit, formatMessage, currentUser, getByName, getUser) {
     const actionURL = audit.action.replace(/\/api\/v[1-9]/, '');
     let auditDesc = '';
 
@@ -347,7 +346,7 @@ export function formatAuditInfo(audit, formatMessage) {
         let channelName = '';
         if (channelNameField.indexOf('name') >= 0) {
             channelURL = channelNameField[channelNameField.indexOf('name') + 1];
-            channelObj = ChannelStore.getByName(channelURL);
+            channelObj = getByName(channelURL);
             if (channelObj) {
                 channelName = channelObj.display_name;
             } else {
@@ -360,7 +359,7 @@ export function formatAuditInfo(audit, formatMessage) {
             auditDesc = formatMessage(holders.channelCreated, {channelName});
             break;
         case '/channels/create_direct':
-            auditDesc = formatMessage(holders.establishedDM, {username: Utils.getDirectTeammate(channelObj.id).username});
+            auditDesc = formatMessage(holders.establishedDM, {username: getDirectTeammate(channelObj.id).username});
             break;
         case '/channels/update':
             auditDesc = formatMessage(holders.nameUpdated, {channelName});
@@ -379,7 +378,7 @@ export function formatAuditInfo(audit, formatMessage) {
 
                 if (userIdField.indexOf('user_id') >= 0) {
                     userId = userIdField[userIdField.indexOf('user_id') + 1];
-                    var profile = UserStore.getProfile(userId);
+                    var profile = getUser(userId);
                     if (profile) {
                         username = profile.username;
                     }
@@ -498,9 +497,9 @@ export function formatAuditInfo(audit, formatMessage) {
 
                 const actingUserInfo = userInfo[1].split('=');
                 if (actingUserInfo[0] === 'session_user') {
-                    const actingUser = UserStore.getProfile(actingUserInfo[1]);
-                    const user = UserStore.getCurrentUser();
-                    if (user && actingUser && (Utils.isSystemAdmin(user.roles))) {
+                    const actingUser = getUser(actingUserInfo[1]);
+                    const user = currentUser;
+                    if (user && actingUser && isSystemAdmin(user.roles)) {
                         auditDesc += formatMessage(holders.by, {username: actingUser.username});
                     } else if (user && actingUser) {
                         auditDesc += formatMessage(holders.byAdmin);
@@ -579,7 +578,7 @@ export function formatAuditInfo(audit, formatMessage) {
             break;
         }
     } else if (actionURL.indexOf('/admin/download_compliance_report') === 0) {
-        auditDesc = Utils.toTitleCase(audit.extra_info);
+        auditDesc = toTitleCase(audit.extra_info);
     } else {
         switch (actionURL) {
         case '/logout':
@@ -602,7 +601,7 @@ export function formatAuditInfo(audit, formatMessage) {
             let actionDesc = '';
             if (actionURL && actionURL.lastIndexOf('/') !== -1) {
                 actionDesc = actionURL.substring(actionURL.lastIndexOf('/') + 1).replace('_', ' ');
-                actionDesc = Utils.toTitleCase(actionDesc);
+                actionDesc = toTitleCase(actionDesc);
             }
 
             let extraInfoDesc = '';

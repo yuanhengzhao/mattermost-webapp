@@ -21,7 +21,7 @@ import {
     makeOnSubmit,
     makeOnEditLatestPost,
 } from 'actions/views/create_comment';
-import {getPostDraft} from 'selectors/rhs';
+import {getPostDraft, getIsRhsExpanded} from 'selectors/rhs';
 
 import CreateComment from './create_comment.jsx';
 
@@ -46,6 +46,7 @@ function mapStateToProps(state, ownProps) {
         messageInHistory,
         enableAddButton,
         channelMembersCount,
+        codeBlockOnCtrlEnter: getBool(state, Preferences.CATEGORY_ADVANCED_SETTINGS, 'code_block_ctrl_enter', true),
         ctrlSend: getBool(state, Preferences.CATEGORY_ADVANCED_SETTINGS, 'send_on_ctrl_enter'),
         createPostErrorId: err.server_error_id,
         readOnlyChannel: !isCurrentUserSystemAdmin(state) && config.ExperimentalTownSquareIsReadOnly === 'true' && channel.name === Constants.DEFAULT_CHANNEL,
@@ -54,6 +55,7 @@ function mapStateToProps(state, ownProps) {
         enableGifPicker,
         locale: getCurrentLocale(state),
         maxPostSize: parseInt(config.MaxPostSize, 10) || Constants.DEFAULT_CHARACTER_LIMIT,
+        rhsExpanded: getIsRhsExpanded(state),
     };
 }
 

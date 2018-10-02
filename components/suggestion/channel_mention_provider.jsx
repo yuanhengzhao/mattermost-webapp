@@ -22,7 +22,7 @@ class ChannelMentionSuggestion extends Suggestion {
         const channelName = item.channel.display_name;
         const purpose = item.channel.purpose;
 
-        let className = 'mentions__name';
+        let className = 'mentions__name no-flex';
         if (isSelection) {
             className += ' suggestion--selected';
         }
@@ -62,10 +62,17 @@ export default class ChannelMentionProvider extends Provider {
     }
 
     handlePretextChanged(suggestionId, pretext) {
+        this.resetRequest();
+
         const captured = (/\B(~([^~\r\n]*))$/i).exec(pretext.toLowerCase());
 
         if (!captured) {
             // Not a channel mention
+            return false;
+        }
+
+        if (captured.index > 0 && pretext[captured.index - 1] === '~') {
+            // Multiple ~'s in a row so let's return and not show the autocomplete
             return false;
         }
 

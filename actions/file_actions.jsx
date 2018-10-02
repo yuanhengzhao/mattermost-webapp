@@ -11,7 +11,7 @@ import {Client4} from 'mattermost-redux/client';
 import store from 'stores/redux_store.jsx';
 import * as Utils from 'utils/utils.jsx';
 
-export function uploadFile(file, name, channelId, clientId, successCallback, errorCallback) {
+export function uploadFile(file, name, channelId, clientId, successCallback, errorCallback, progress) {
     const {dispatch, getState} = store;
 
     function handleResponse(err, res) {
@@ -38,7 +38,7 @@ export function uploadFile(file, name, channelId, clientId, successCallback, err
             dispatch(batchActions([failure, getLogErrorAction(err)]), getState);
 
             if (errorCallback) {
-                errorCallback(e);
+                errorCallback(e, clientId, channelId);
             }
         } else if (res) {
             const data = res.body.file_infos.map((fileInfo, index) => {
@@ -61,7 +61,7 @@ export function uploadFile(file, name, channelId, clientId, successCallback, err
             ]), getState);
 
             if (successCallback) {
-                successCallback(res.body);
+                successCallback(res.body, channelId);
             }
         }
     }
@@ -75,6 +75,7 @@ export function uploadFile(file, name, channelId, clientId, successCallback, err
         field('channel_id', channelId).
         field('client_ids', clientId).
         accept('application/json').
+        on('progress', (e) => progress(e, name, clientId)).
         end(handleResponse);
 }
 

@@ -129,7 +129,7 @@ export default class EditPostModal extends React.PureComponent {
 
         this.setState({showEmojiPicker: false});
 
-        this.refs.editbox.focus();
+        this.editbox.focus();
     }
 
     handleGifClick = (gif) => {
@@ -140,7 +140,7 @@ export default class EditPostModal extends React.PureComponent {
             this.setState({editText: newMessage});
         }
         this.setState({showEmojiPicker: false});
-        this.refs.editbox.focus();
+        this.editbox.focus();
     }
 
     getEditPostControls = () => {
@@ -213,11 +213,11 @@ export default class EditPostModal extends React.PureComponent {
     handleEditKeyPress = (e) => {
         if (!UserAgent.isMobile() && !this.props.ctrlSend && Utils.isKeyPressed(e, KeyCodes.ENTER) && !e.shiftKey && !e.altKey) {
             e.preventDefault();
-            this.refs.editbox.blur();
+            this.editbox.blur();
             this.handleEdit();
         } else if (this.props.ctrlSend && e.ctrlKey && Utils.isKeyPressed(e, KeyCodes.ENTER)) {
             e.preventDefault();
-            this.refs.editbox.blur();
+            this.editbox.blur();
             this.handleEdit();
         }
     }
@@ -225,6 +225,8 @@ export default class EditPostModal extends React.PureComponent {
     handleKeyDown = (e) => {
         if (this.props.ctrlSend && Utils.isKeyPressed(e, KeyCodes.ENTER) && e.ctrlKey === true) {
             this.handleEdit();
+        } else if (Utils.isKeyPressed(e, KeyCodes.ESCAPE)) {
+            this.handleHide();
         }
     }
 
@@ -234,12 +236,12 @@ export default class EditPostModal extends React.PureComponent {
     }
 
     handleEntered = () => {
-        this.refs.editbox.focus();
-        this.refs.editbox.recalculateSize();
+        this.editbox.focus();
+        this.editbox.recalculateSize();
     }
 
     handleExit = () => {
-        this.refs.editbox.hidePreview();
+        this.editbox.hidePreview();
     }
 
     handleExited = () => {
@@ -255,6 +257,13 @@ export default class EditPostModal extends React.PureComponent {
 
         this.refocusId = null;
         this.setState({editText: '', postError: '', errorClass: null, showEmojiPicker: false});
+    }
+
+    setEditboxRef = (ref) => {
+        this.editbox = ref;
+        if (this.editbox) {
+            this.editbox.focus();
+        }
     }
 
     render() {
@@ -297,6 +306,7 @@ export default class EditPostModal extends React.PureComponent {
                 onEntered={this.handleEntered}
                 onExit={this.handleExit}
                 onExited={this.handleExited}
+                keyboard={false}
             >
                 <Modal.Header closeButton={true}>
                     <Modal.Title>
@@ -325,7 +335,7 @@ export default class EditPostModal extends React.PureComponent {
                         supportsCommands={false}
                         suggestionListStyle='bottom'
                         id='edit_textbox'
-                        ref='editbox'
+                        ref={this.setEditboxRef}
                         characterLimit={this.props.maxPostSize}
                     />
                     <span

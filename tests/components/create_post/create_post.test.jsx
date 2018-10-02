@@ -12,6 +12,7 @@ import * as Utils from 'utils/utils.jsx';
 
 import CreatePost from 'components/create_post/create_post.jsx';
 
+jest.useFakeTimers();
 jest.mock('actions/global_actions.jsx', () => ({
     emitLocalUserTypingEvent: jest.fn(),
     emitUserPostedEvent: jest.fn(),
@@ -119,6 +120,7 @@ function createPost({
             enableGifPicker={true}
             maxPostSize={Constants.DEFAULT_CHARACTER_LIMIT}
             userIsOutOfOffice={false}
+            rhsExpanded={false}
         />
     );
 }
@@ -444,6 +446,8 @@ describe('components/create_post', () => {
             ],
         };
 
+        instance.draftsForChannel[currentChannelProp.id] = uploadsInProgressDraft;
+
         wrapper.setProps({draft: uploadsInProgressDraft});
         const fileInfos = {
             id: 'a',
@@ -457,6 +461,48 @@ describe('components/create_post', () => {
         };
 
         instance.handleFileUploadComplete(fileInfos, clientIds, currentChannelProp.id);
+        jest.runAllTimers();
+        expect(setDraft).toHaveBeenCalledWith(StoragePrefixes.DRAFT + currentChannelProp.id, expectedDraft);
+    });
+
+    it('check for setDraft callback on unmount if timer is running', () => {
+        const setDraft = jest.fn();
+
+        const wrapper = shallow(
+            createPost({
+                actions: {
+                    ...actionsProp,
+                    setDraft,
+                },
+            })
+        );
+
+        const instance = wrapper.instance();
+        const clientIds = ['a'];
+        const uploadsInProgressDraft = {
+            ...draftProp,
+            uploadsInProgress: [
+                ...draftProp.uploadsInProgress,
+                'a',
+            ],
+        };
+
+        instance.draftsForChannel[currentChannelProp.id] = uploadsInProgressDraft;
+
+        wrapper.setProps({draft: uploadsInProgressDraft});
+        const fileInfos = {
+            id: 'a',
+        };
+        const expectedDraft = {
+            ...draftProp,
+            fileInfos: [
+                ...draftProp.fileInfos,
+                fileInfos,
+            ],
+        };
+
+        instance.handleFileUploadComplete(fileInfos, clientIds, currentChannelProp.id);
+        wrapper.unmount();
         expect(setDraft).toHaveBeenCalledWith(StoragePrefixes.DRAFT + currentChannelProp.id, expectedDraft);
     });
 
@@ -527,13 +573,13 @@ describe('components/create_post', () => {
     it('Should call Shortcut modal on FORWARD_SLASH+cntrl/meta', () => {
         const wrapper = shallow(createPost());
         const instance = wrapper.instance();
-        instance.showShortcuts({ctrlKey: true, key: Constants.KeyCodes.BACK_SLASH[0], keyCode: Constants.KeyCodes.BACK_SLASH[1], preventDefault: jest.fn});
+        instance.documentKeyHandler({ctrlKey: true, key: Constants.KeyCodes.BACK_SLASH[0], keyCode: Constants.KeyCodes.BACK_SLASH[1], preventDefault: jest.fn});
         expect(GlobalActions.toggleShortcutsModal).not.toHaveBeenCalled();
-        instance.showShortcuts({ctrlKey: true, key: 'ù', keyCode: Constants.KeyCodes.FORWARD_SLASH[1], preventDefault: jest.fn});
-        expect(GlobalActions.toggleShortcutsModal).not.toHaveBeenCalled();
-        instance.showShortcuts({ctrlKey: true, key: '/', keyCode: Constants.KeyCodes.SEVEN[1], preventDefault: jest.fn});
+        instance.documentKeyHandler({ctrlKey: true, key: 'ù', keyCode: Constants.KeyCodes.FORWARD_SLASH[1], preventDefault: jest.fn});
         expect(GlobalActions.toggleShortcutsModal).toHaveBeenCalled();
-        instance.showShortcuts({ctrlKey: true, key: Constants.KeyCodes.FORWARD_SLASH[0], keyCode: Constants.KeyCodes.FORWARD_SLASH[1], preventDefault: jest.fn});
+        instance.documentKeyHandler({ctrlKey: true, key: '/', keyCode: Constants.KeyCodes.SEVEN[1], preventDefault: jest.fn});
+        expect(GlobalActions.toggleShortcutsModal).toHaveBeenCalled();
+        instance.documentKeyHandler({ctrlKey: true, key: Constants.KeyCodes.FORWARD_SLASH[0], keyCode: Constants.KeyCodes.FORWARD_SLASH[1], preventDefault: jest.fn});
         expect(GlobalActions.toggleShortcutsModal).toHaveBeenCalled();
     });
 

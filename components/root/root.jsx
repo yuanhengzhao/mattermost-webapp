@@ -40,6 +40,7 @@ import loadPasswordResetSendLink from 'bundle-loader?lazy!components/password_re
 import loadPasswordResetForm from 'bundle-loader?lazy!components/password_reset_form';
 import loadSignupController from 'bundle-loader?lazy!components/signup/signup_controller';
 import loadSignupEmail from 'bundle-loader?lazy!components/signup/signup_email';
+import loadTermsOfService from 'bundle-loader?lazy!components/terms_of_service';
 import loadShouldVerifyEmail from 'bundle-loader?lazy!components/should_verify_email';
 import loadDoVerifyEmail from 'bundle-loader?lazy!components/do_verify_email';
 import loadClaimController from 'bundle-loader?lazy!components/claim';
@@ -55,6 +56,7 @@ import {getSiteURL} from 'utils/url.jsx';
 
 const CreateTeam = makeAsyncComponent(loadCreateTeam);
 const ErrorPage = makeAsyncComponent(loadErrorPage);
+const TermsOfService = makeAsyncComponent(loadTermsOfService);
 const LoginController = makeAsyncComponent(loadLoginController);
 const AdminConsole = makeAsyncComponent(loadAdminConsole);
 const LoggedIn = makeAsyncComponent(loadLoggedIn);
@@ -89,6 +91,7 @@ export default class Root extends React.Component {
         diagnosticId: PropTypes.string,
         noAccounts: PropTypes.bool,
         children: PropTypes.object,
+        showTermsOfService: PropTypes.bool,
     }
 
     constructor(props) {
@@ -153,7 +156,7 @@ export default class Root extends React.Component {
 
         /*eslint-disable */
         if (segmentKey != null && segmentKey !== '' && this.props.diagnosticsEnabled) {
-            !function(){var analytics=global.window.analytics=global.window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","group","track","ready","alias","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.load=function(t){var e=document.createElement("script");e.type="text/javascript";e.async=!0;e.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(e,n)};analytics.SNIPPET_VERSION="3.0.1";
+            !function(){var analytics=global.window.analytics=global.window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","group","track","ready","alias","page","once","off","on"];analytics.factory=function(t){return function(...args){var e=Array.prototype.slice.call(args);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.load=function(t){var e=document.createElement("script");e.type="text/javascript";e.async=!0;e.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(e,n)};analytics.SNIPPET_VERSION="3.0.1";
                 analytics.load(segmentKey);
 
                 analytics.identify(diagnosticId, {}, {
@@ -235,6 +238,8 @@ export default class Root extends React.Component {
         if (props.location.pathname === '/') {
             if (this.props.noAccounts) {
                 this.props.history.push('/signup_user_complete');
+            } else if (props.showTermsOfService) {
+                this.props.history.push('/terms_of_service');
             } else if (UserStore.getCurrentUser()) {
                 GlobalActions.redirectUserToDefaultTeam();
             }
@@ -307,6 +312,10 @@ export default class Root extends React.Component {
                         path={'/help'}
                         component={HelpController}
                     />
+                    <LoggedInHFTRoute
+                        path={'/terms_of_service'}
+                        component={TermsOfService}
+                    />
                     <Route
                         path={'/get_ios_app'}
                         component={GetIosApp}
@@ -339,7 +348,12 @@ export default class Root extends React.Component {
                         path={'/:team'}
                         component={NeedsTeam}
                     />
-                    <Redirect to={'/login'}/>
+                    <Redirect
+                        to={{
+                            ...this.props.location,
+                            pathname: '/login',
+                        }}
+                    />
                 </Switch>
             </IntlProvider>
         );

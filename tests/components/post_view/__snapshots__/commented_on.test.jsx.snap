@@ -6,11 +6,10 @@ exports[`components/post_view/CommentedOn should match snapshot 1`] = `
 >
   <span>
     <FormattedMessage
-      defaultMessage="Commented on {name}{apostrophe} message: "
+      defaultMessage="Commented on {name}'s message: "
       id="post_body.commentedOn"
       values={
         Object {
-          "apostrophe": "'s",
           "name": <a
             className="theme"
             onClick={[Function]}
@@ -36,11 +35,10 @@ exports[`components/post_view/CommentedOn should match snapshot 2`] = `
 >
   <span>
     <FormattedMessage
-      defaultMessage="Commented on {name}{apostrophe} message: "
+      defaultMessage="Commented on {name}'s message: "
       id="post_body.commentedOn"
       values={
         Object {
-          "apostrophe": "'s",
           "name": <a
             className="theme"
             onClick={[Function]}
@@ -66,11 +64,10 @@ exports[`components/post_view/CommentedOn should match snapshot 3`] = `
 >
   <span>
     <FormattedMessage
-      defaultMessage="Commented on {name}{apostrophe} message: "
+      defaultMessage="Commented on {name}'s message: "
       id="post_body.commentedOn"
       values={
         Object {
-          "apostrophe": "'s",
           "name": <a
             className="theme"
             onClick={[Function]}
@@ -87,6 +84,122 @@ exports[`components/post_view/CommentedOn should match snapshot 3`] = `
       <Connect(CommentedOnFilesMessage)
         parentPostId="post_id"
       />
+    </a>
+  </span>
+</div>
+`;
+
+exports[`components/post_view/CommentedOn should match snapshots for post with props.fallback as message 1`] = `
+<div
+  className="post__link"
+>
+  <span>
+    <FormattedMessage
+      defaultMessage="Commented on {name}'s message: "
+      id="post_body.commentedOn"
+      values={
+        Object {
+          "name": <a
+            className="theme"
+            onClick={[Function]}
+          >
+            override_username
+          </a>,
+        }
+      }
+    />
+    <a
+      className="theme"
+      onClick={[MockFunction]}
+    >
+      This is fallback message
+    </a>
+  </span>
+</div>
+`;
+
+exports[`components/post_view/CommentedOn should match snapshots for post with props.pretext as message 1`] = `
+<div
+  className="post__link"
+>
+  <span>
+    <FormattedMessage
+      defaultMessage="Commented on {name}'s message: "
+      id="post_body.commentedOn"
+      values={
+        Object {
+          "name": <a
+            className="theme"
+            onClick={[Function]}
+          >
+            override_username
+          </a>,
+        }
+      }
+    />
+    <a
+      className="theme"
+      onClick={[MockFunction]}
+    >
+      This is a pretext
+    </a>
+  </span>
+</div>
+`;
+
+exports[`components/post_view/CommentedOn should match snapshots for post with props.text as message 1`] = `
+<div
+  className="post__link"
+>
+  <span>
+    <FormattedMessage
+      defaultMessage="Commented on {name}'s message: "
+      id="post_body.commentedOn"
+      values={
+        Object {
+          "name": <a
+            className="theme"
+            onClick={[Function]}
+          >
+            override_username
+          </a>,
+        }
+      }
+    />
+    <a
+      className="theme"
+      onClick={[MockFunction]}
+    >
+      This is a text
+    </a>
+  </span>
+</div>
+`;
+
+exports[`components/post_view/CommentedOn should match snapshots for post with props.title as message 1`] = `
+<div
+  className="post__link"
+>
+  <span>
+    <FormattedMessage
+      defaultMessage="Commented on {name}'s message: "
+      id="post_body.commentedOn"
+      values={
+        Object {
+          "name": <a
+            className="theme"
+            onClick={[Function]}
+          >
+            override_username
+          </a>,
+        }
+      }
+    />
+    <a
+      className="theme"
+      onClick={[MockFunction]}
+    >
+      This is a title
     </a>
   </span>
 </div>

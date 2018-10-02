@@ -67,6 +67,10 @@
                 display: block;
             }
 
+            .custom-textarea {
+                max-height: 162px;
+            }
+
             textarea {
                 .app-content & {
                     border-left: none;
@@ -640,6 +644,10 @@
         margin-bottom: 30px;
         padding: 60px 10px 0;
 
+        .min-height--fill {
+            min-height: calc(100vh - 526px);
+        }
+
         .signup-team__name {
             font-size: 2em;
         }
@@ -907,6 +915,16 @@
     }
 
     #navbar {
+        .browser--ie & {
+            .navbar-default {
+                .dropdown-menu {
+                    .close {
+                        top: 70px;
+                    }
+                }
+            }
+        }
+
         .navbar-default {
             .navbar-header {
                 float: none;
@@ -1142,10 +1160,6 @@
             width: 260px;
         }
 
-        .badge {
-            top: 15px;
-        }
-
         .team__header {
             @include clearfix;
             pointer-events: none;
@@ -1192,17 +1206,17 @@
                 }
 
                 .sidebar-item {
-                    padding: 12px 0 12px 17px;
+                    height: 45px;
 
                     &.has-close {
                         .btn-close {
                             @include opacity(.5);
                             display: block;
                             font-size: 25px;
-                            right: 4px;
-                            text-align: center;
-                            top: 4px;
-                            width: 40px;
+                            margin-right: 4px;
+                            width: 30px;
+                            height: 30px;
+                            line-height: 30px;
                         }
                     }
                 }
@@ -1418,6 +1432,16 @@
 
     .post {
         .attachment {
+            .attachment-actions {
+                .alert {
+                    position: relative;
+                    left: 0;
+                    top: 0;
+                    margin: 1rem 0 0.4rem;
+                    display: inline-block;
+                }
+            }
+
             .attachment__body__wrap {
                 .btn-close {
                     height: 30px;
@@ -1432,6 +1456,17 @@
 }
 
 @media screen and (max-width: 640px) {
+    .multi-select__help {
+        flex-direction: column;
+
+        > span {
+            &:first-child {
+                margin-bottom: 1rem;
+            }
+        }
+    }
+
+
     .post__header {
         .dropdown-menu {
             > li {
@@ -1803,6 +1838,23 @@
 
         .signup-team__name {
             font-size: 2em;
+        }
+    }
+}
+
+@media screen and (max-width: 380px) {
+    .signup-team__container {
+        .min-height--fill {
+            min-height: 0;
+        }
+    }
+}
+
+@media screen and (max-width: 350px) {
+    .post-attachment-dropdown {
+        &:after {
+            left: auto;
+            right: 12px;
         }
     }
 }
