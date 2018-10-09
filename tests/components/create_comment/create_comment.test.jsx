@@ -8,7 +8,6 @@ import Constants from 'utils/constants.jsx';
 
 import CreateComment from 'components/create_comment/create_comment.jsx';
 
-jest.useFakeTimers();
 jest.mock('stores/post_store.jsx', () => ({
     clearCommentDraftUploads: jest.fn(),
 }));
@@ -35,6 +34,7 @@ describe('components/CreateComment', () => {
         getSidebarBody: jest.fn(),
         clearCommentDraftUploads: jest.fn(),
         onUpdateCommentDraft: jest.fn(),
+        updateCommentDraftWithRootId: jest.fn(),
         onSubmit: jest.fn(),
         onResetHistoryIndex: jest.fn(),
         onMoveHistoryIndexBack: jest.fn(),
@@ -183,24 +183,28 @@ describe('components/CreateComment', () => {
     });
 
     test('handleUploadError should update state with the correct error', () => {
-        const onUpdateCommentDraft = jest.fn();
+        const updateCommentDraftWithRootId = jest.fn();
         const draft = {
             message: 'Test message',
             uploadsInProgress: [1, 2, 3],
             fileInfos: [{}, {}, {}],
         };
-        const props = {...baseProps, draft, onUpdateCommentDraft};
+        const props = {...baseProps, draft, updateCommentDraftWithRootId};
 
         const wrapper = shallow(
             <CreateComment {...props}/>
         );
 
+        const instance = wrapper.instance();
+
         const testError1 = 'test error 1';
         wrapper.setState({draft});
-        wrapper.instance().handleUploadError(testError1, 1);
+        instance.draftsForPost[props.rootId] = draft;
+        instance.handleUploadError(testError1, 1, props.rootId);
 
-        expect(onUpdateCommentDraft).toHaveBeenCalled();
-        expect(onUpdateCommentDraft.mock.calls[0][0]).toEqual(
+        expect(updateCommentDraftWithRootId).toHaveBeenCalled();
+        expect(updateCommentDraftWithRootId.mock.calls[0][0]).toEqual(props.rootId);
+        expect(updateCommentDraftWithRootId.mock.calls[0][1]).toEqual(
             expect.objectContaining({uploadsInProgress: [2, 3]})
         );
         expect(wrapper.state().serverError).toBe(testError1);
@@ -208,10 +212,10 @@ describe('components/CreateComment', () => {
 
         // clientId = -1
         const testError2 = 'test error 2';
-        wrapper.instance().handleUploadError(testError2, -1);
+        instance.handleUploadError(testError2, -1, props.rootId);
 
         // should not call onUpdateCommentDraft
-        expect(onUpdateCommentDraft.mock.calls.length).toBe(1);
+        expect(updateCommentDraftWithRootId.mock.calls.length).toBe(1);
         expect(wrapper.state().serverError).toBe(testError2);
     });
 
@@ -278,58 +282,34 @@ describe('components/CreateComment', () => {
     });
 
     test('handleFileUploadComplete should update comment draft correctly', () => {
-        const onUpdateCommentDraft = jest.fn();
+        const updateCommentDraftWithRootId = jest.fn();
         const fileInfos = [{id: '1', name: 'aaa', create_at: 100}, {id: '2', name: 'bbb', create_at: 200}];
         const draft = {
             message: 'Test message',
             uploadsInProgress: [1, 2, 3],
             fileInfos,
         };
-        const props = {...baseProps, onUpdateCommentDraft, draft};
+        const props = {...baseProps, updateCommentDraftWithRootId, draft};
 
         const wrapper = shallow(
             <CreateComment {...props}/>
         );
 
+        const instance = wrapper.instance();
         wrapper.setState({draft});
+        instance.draftsForPost[props.rootId] = draft;
 
         const uploadCompleteFileInfo = [{id: '3', name: 'ccc', create_at: 300}];
         const expectedNewFileInfos = fileInfos.concat(uploadCompleteFileInfo);
-        wrapper.instance().handleFileUploadComplete(uploadCompleteFileInfo, [3]);
-        jest.runAllTimers();
-        expect(onUpdateCommentDraft).toHaveBeenCalled();
-        expect(onUpdateCommentDraft.mock.calls[0][0]).toEqual(
+        instance.handleFileUploadComplete(uploadCompleteFileInfo, [3], null, props.rootId);
+        expect(updateCommentDraftWithRootId).toHaveBeenCalled();
+        expect(updateCommentDraftWithRootId.mock.calls[0][0]).toEqual(props.rootId);
+        expect(updateCommentDraftWithRootId.mock.calls[0][1]).toEqual(
             expect.objectContaining({uploadsInProgress: [1, 2], fileInfos: expectedNewFileInfos})
         );
 
         expect(wrapper.state().draft.uploadsInProgress).toEqual([1, 2]);
         expect(wrapper.state().draft.fileInfos).toEqual(expectedNewFileInfos);
-    });
-
-    test('handleFileUploadComplete should update comment draft on unmount if timeout is running', () => {
-        const onUpdateCommentDraft = jest.fn();
-        const fileInfos = [{id: '1', name: 'aaa', create_at: 100}, {id: '2', name: 'bbb', create_at: 200}];
-        const draft = {
-            message: 'Test message',
-            uploadsInProgress: [1, 2, 3],
-            fileInfos,
-        };
-        const props = {...baseProps, onUpdateCommentDraft, draft};
-
-        const wrapper = shallow(
-            <CreateComment {...props}/>
-        );
-
-        wrapper.setState({draft});
-
-        const uploadCompleteFileInfo = [{id: '3', name: 'ccc', create_at: 300}];
-        const expectedNewFileInfos = fileInfos.concat(uploadCompleteFileInfo);
-        wrapper.instance().handleFileUploadComplete(uploadCompleteFileInfo, [3]);
-        wrapper.unmount();
-        expect(onUpdateCommentDraft).toHaveBeenCalled();
-        expect(onUpdateCommentDraft.mock.calls[0][0]).toEqual(
-            expect.objectContaining({uploadsInProgress: [1, 2], fileInfos: expectedNewFileInfos})
-        );
     });
 
     test('calls showPostDeletedModal when createPostErrorId === api.post.create_post.root_id.app_error', () => {

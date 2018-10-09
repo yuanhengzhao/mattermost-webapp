@@ -184,11 +184,14 @@
             @include single-transition(all, .1s, linear);
             @include border-radius(4px);
             bottom: 0;
-            cursor: 'pointer';
-            display: flex;
+            cursor: pointer;
+            display: inline-flex;
             min-height: 40px;
+            min-width: 40px;
             max-height: 350px;
             max-width: 100%;
+            align-content: center;
+            justify-content: center;
             opacity: 0;
             overflow: hidden;
             position: relative;
@@ -360,7 +363,7 @@
                 text-decoration: none;
             }
 
-            .post-image__type, .post-image__text {
+            .post-image__type {
                 @include opacity(.6);
             }
 
@@ -461,24 +464,4 @@
 .view-image__loading {
     background: $black;
     min-height: 100px;
-}
-
-.file-upload-progress {
-    .checkmark {
-        position: absolute;
-        left: 30px;
-        top: 33px;
-        fill: $link-color;
-    }
-}
-
-
-.file-upload-progress__circle {
-    margin: 10%;
-    height: 80%;
-
-    .file-upload-progress__inside-text {
-        font-size: 20px;
-        stroke: none !important;
-    }
 }

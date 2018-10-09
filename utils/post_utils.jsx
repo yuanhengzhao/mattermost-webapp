@@ -165,26 +165,19 @@ export function shouldFocusMainTextbox(e, activeElement) {
     return true;
 }
 
-function allowSendingAMessage(message) {
-    const splitMessage = message.split('\n');
-    let lastLineMessage = splitMessage[splitMessage.length - 1];
+function canAutomaticallyCloseBackticks(message) {
+    const splitMessage = message.split('\n').filter((line) => line.trim() !== '');
+    const lastPart = splitMessage[splitMessage.length - 1];
 
-    if (splitMessage.length > 1 && !lastLineMessage.includes('```')) {
-        while (splitMessage.length > 1 && !lastLineMessage.includes('```')) {
-            if (lastLineMessage.trim() !== '') {
-                return {
-                    allowSending: true,
-                    message: message.endsWith('\n') ? message.concat('```') : message.concat('\n```'),
-                    withClosedCodeBlock: true,
-                };
-            }
-
-            splitMessage.splice(splitMessage.length - 1);
-            lastLineMessage = splitMessage[splitMessage.length - 1];
-        }
+    if (splitMessage.length > 1 && !lastPart.includes('```')) {
+        return {
+            allowSending: true,
+            message: message.endsWith('\n') ? message.concat('```') : message.concat('\n```'),
+            withClosedCodeBlock: true,
+        };
     }
 
-    return {allowSending: false};
+    return {allowSending: true};
 }
 
 function sendOnCtrlEnter(message, ctrlOrMetaKeyPressed, isSendMessageOnCtrlEnter) {
@@ -194,7 +187,7 @@ function sendOnCtrlEnter(message, ctrlOrMetaKeyPressed, isSendMessageOnCtrlEnter
     } else if (!isSendMessageOnCtrlEnter && (!match || match.length % 2 === 0)) {
         return {allowSending: true};
     } else if (ctrlOrMetaKeyPressed && match && match.length % 2 !== 0) {
-        return allowSendingAMessage(message);
+        return canAutomaticallyCloseBackticks(message);
     }
 
     return {allowSending: false};
@@ -203,7 +196,6 @@ function sendOnCtrlEnter(message, ctrlOrMetaKeyPressed, isSendMessageOnCtrlEnter
 export function postMessageOnKeyPress(event, message, sendMessageOnCtrlEnter, sendCodeBlockOnCtrlEnter) {
     if (
         !event ||
-        message.trim() === '' ||
         isMobile() ||
         !Utils.isKeyPressed(event, Constants.KeyCodes.ENTER) ||
         event.shiftKey ||
@@ -212,7 +204,10 @@ export function postMessageOnKeyPress(event, message, sendMessageOnCtrlEnter, se
         return {allowSending: false};
     }
 
-    if (!(sendMessageOnCtrlEnter || sendCodeBlockOnCtrlEnter)) {
+    if (
+        message.trim() === '' ||
+        !(sendMessageOnCtrlEnter || sendCodeBlockOnCtrlEnter)
+    ) {
         return {allowSending: true};
     }
 

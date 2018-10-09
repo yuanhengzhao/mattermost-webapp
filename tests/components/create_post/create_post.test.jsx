@@ -12,7 +12,6 @@ import * as Utils from 'utils/utils.jsx';
 
 import CreatePost from 'components/create_post/create_post.jsx';
 
-jest.useFakeTimers();
 jest.mock('actions/global_actions.jsx', () => ({
     emitLocalUserTypingEvent: jest.fn(),
     emitUserPostedEvent: jest.fn(),
@@ -228,9 +227,10 @@ describe('components/create_post', () => {
 
     it('onKeyPress textbox should call emitLocalUserTypingEvent', () => {
         const wrapper = shallow(createPost());
+        wrapper.instance().refs = {textbox: {blur: jest.fn()}};
 
         const postTextbox = wrapper.find('#post_textbox');
-        postTextbox.simulate('KeyPress', {key: KeyCodes.ENTER[0], preventDefault: jest.fn()});
+        postTextbox.simulate('KeyPress', {key: KeyCodes.ENTER[0], preventDefault: jest.fn(), persist: jest.fn()});
         expect(GlobalActions.emitLocalUserTypingEvent).toHaveBeenCalledWith(currentChannelProp.id, '');
     });
 
@@ -461,48 +461,6 @@ describe('components/create_post', () => {
         };
 
         instance.handleFileUploadComplete(fileInfos, clientIds, currentChannelProp.id);
-        jest.runAllTimers();
-        expect(setDraft).toHaveBeenCalledWith(StoragePrefixes.DRAFT + currentChannelProp.id, expectedDraft);
-    });
-
-    it('check for setDraft callback on unmount if timer is running', () => {
-        const setDraft = jest.fn();
-
-        const wrapper = shallow(
-            createPost({
-                actions: {
-                    ...actionsProp,
-                    setDraft,
-                },
-            })
-        );
-
-        const instance = wrapper.instance();
-        const clientIds = ['a'];
-        const uploadsInProgressDraft = {
-            ...draftProp,
-            uploadsInProgress: [
-                ...draftProp.uploadsInProgress,
-                'a',
-            ],
-        };
-
-        instance.draftsForChannel[currentChannelProp.id] = uploadsInProgressDraft;
-
-        wrapper.setProps({draft: uploadsInProgressDraft});
-        const fileInfos = {
-            id: 'a',
-        };
-        const expectedDraft = {
-            ...draftProp,
-            fileInfos: [
-                ...draftProp.fileInfos,
-                fileInfos,
-            ],
-        };
-
-        instance.handleFileUploadComplete(fileInfos, clientIds, currentChannelProp.id);
-        wrapper.unmount();
         expect(setDraft).toHaveBeenCalledWith(StoragePrefixes.DRAFT + currentChannelProp.id, expectedDraft);
     });
 
@@ -529,6 +487,7 @@ describe('components/create_post', () => {
 
         wrapper.setProps({draft: uploadsInProgressDraft});
 
+        instance.draftsForChannel[currentChannelProp.id] = uploadsInProgressDraft;
         instance.handleUploadError('error message', 'a', currentChannelProp.id);
 
         expect(setDraft).toHaveBeenCalledWith(StoragePrefixes.DRAFT + currentChannelProp.id, draftProp);
@@ -573,13 +532,13 @@ describe('components/create_post', () => {
     it('Should call Shortcut modal on FORWARD_SLASH+cntrl/meta', () => {
         const wrapper = shallow(createPost());
         const instance = wrapper.instance();
-        instance.documentKeyHandler({ctrlKey: true, key: Constants.KeyCodes.BACK_SLASH[0], keyCode: Constants.KeyCodes.BACK_SLASH[1], preventDefault: jest.fn});
+        instance.documentKeyHandler({ctrlKey: true, key: Constants.KeyCodes.BACK_SLASH[0], keyCode: Constants.KeyCodes.BACK_SLASH[1], preventDefault: jest.fn()});
         expect(GlobalActions.toggleShortcutsModal).not.toHaveBeenCalled();
-        instance.documentKeyHandler({ctrlKey: true, key: 'ù', keyCode: Constants.KeyCodes.FORWARD_SLASH[1], preventDefault: jest.fn});
+        instance.documentKeyHandler({ctrlKey: true, key: 'ù', keyCode: Constants.KeyCodes.FORWARD_SLASH[1], preventDefault: jest.fn()});
         expect(GlobalActions.toggleShortcutsModal).toHaveBeenCalled();
-        instance.documentKeyHandler({ctrlKey: true, key: '/', keyCode: Constants.KeyCodes.SEVEN[1], preventDefault: jest.fn});
+        instance.documentKeyHandler({ctrlKey: true, key: '/', keyCode: Constants.KeyCodes.SEVEN[1], preventDefault: jest.fn()});
         expect(GlobalActions.toggleShortcutsModal).toHaveBeenCalled();
-        instance.documentKeyHandler({ctrlKey: true, key: Constants.KeyCodes.FORWARD_SLASH[0], keyCode: Constants.KeyCodes.FORWARD_SLASH[1], preventDefault: jest.fn});
+        instance.documentKeyHandler({ctrlKey: true, key: Constants.KeyCodes.FORWARD_SLASH[0], keyCode: Constants.KeyCodes.FORWARD_SLASH[1], preventDefault: jest.fn()});
         expect(GlobalActions.toggleShortcutsModal).toHaveBeenCalled();
     });
 
@@ -587,8 +546,11 @@ describe('components/create_post', () => {
         const wrapper = shallow(createPost({
             ctrlSend: true,
         }));
+
         const instance = wrapper.instance();
-        instance.handleKeyDown({ctrlKey: true, key: Constants.KeyCodes.ENTER[0], keyCode: Constants.KeyCodes.ENTER[1], preventDefault: jest.fn, persist: jest.fn});
+        instance.refs = {textbox: {blur: jest.fn()}};
+
+        instance.handleKeyDown({ctrlKey: true, key: Constants.KeyCodes.ENTER[0], keyCode: Constants.KeyCodes.ENTER[1], preventDefault: jest.fn(), persist: jest.fn()});
         setTimeout(() => {
             expect(GlobalActions.emitLocalUserTypingEvent).toHaveBeenCalledWith(currentChannelProp.id, '');
         }, 0);
