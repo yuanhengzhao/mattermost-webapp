@@ -58,7 +58,7 @@ function makeMapStateToProps() {
         }
 
         let lastViewedChannelName = getLastViewedChannelName(state);
-        if (!lastViewedChannelName) {
+        if (!lastViewedChannelName || (channel && lastViewedChannelName === channel.name)) {
             lastViewedChannelName = Constants.DEFAULT_CHANNEL;
         }
 

@@ -20,6 +20,7 @@ import Constants from 'utils/constants.jsx';
 import messageHtmlToComponent from 'utils/message_html_to_component';
 import * as TextFormatting from 'utils/text_formatting.jsx';
 import * as Utils from 'utils/utils.jsx';
+import {showNotification} from 'utils/notifications.jsx';
 import {t} from 'utils/i18n.jsx';
 
 import logoImage from 'images/logo.png';
@@ -103,7 +104,9 @@ class LoginController extends React.Component {
         if (extra === Constants.SIGNIN_VERIFIED && email) {
             this.refs.password.focus();
         }
-        if (LocalStorageStore.getWasLoggedIn()) {
+
+        // Determine if the user was unexpectedly logged out.
+        if (LocalStorageStore.getWasLoggedIn() && extra !== Constants.SIGNIN_CHANGE) {
             // Although the authority remains the local sessionExpired bit on the state, set this
             // extra field in the querystring to signal the desktop app. And although eslint
             // complains about this, it is allowed: https://reactjs.org/docs/react-component.html#componentdidmount.
@@ -143,7 +146,7 @@ class LoginController extends React.Component {
 
     showSessionExpiredNotificationIfNeeded = () => {
         if (this.state.sessionExpired && !this.closeSessionExpiredNotification) {
-            Utils.showNotification({
+            showNotification({
                 title: this.props.siteName,
                 body: Utils.localizeMessage(
                     'login.session_expired.notification',
@@ -571,7 +574,7 @@ class LoginController extends React.Component {
                                 placeholder={this.createLoginPlaceholder()}
                                 spellCheck='false'
                                 autoCapitalize='off'
-                                autoFocus='true'
+                                autoFocus={true}
                             />
                         </div>
                         <div className={'form-group' + errorClass}>
