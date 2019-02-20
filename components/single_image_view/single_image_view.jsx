@@ -184,7 +184,7 @@ export default class SingleImageView extends React.PureComponent {
         let imageContainerStyle = {};
         if (width < viewPortWidth && height === PREVIEW_IMAGE_MAX_HEIGHT) {
             imageContainerStyle = {width};
-        } else if (fileType === FileTypes.SVG) {
+        } else if (fileType === FileTypes.SVG && (!fileInfo.width || !fileInfo.height)) {
             svgClass = 'post-image normal';
             imageStyle = {};
             imageLoadedStyle = {};
@@ -207,7 +207,7 @@ export default class SingleImageView extends React.PureComponent {
             imageStyle = {cursor: 'pointer'};
             imageLoadedStyle = {};
 
-            if (fileType === FileTypes.SVG) {
+            if (fileType === FileTypes.SVG && (!fileInfo.width || !fileInfo.height)) {
                 imageContainerStyle = {width: viewPortWidth < PREVIEW_IMAGE_MAX_HEIGHT ? viewPortWidth : PREVIEW_IMAGE_MAX_HEIGHT};
             }
         } else if (this.props.isEmbedVisible) {
