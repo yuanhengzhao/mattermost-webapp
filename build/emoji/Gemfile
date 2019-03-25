@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'chunky_png'
-gem 'gemoji', '~> 3.0.0'
+gem 'gemoji', git: 'git@github.com:deanwhillier/gemoji.git', ref: '3cc9d11'
 gem 'sprite-factory'
 
 group :test do
