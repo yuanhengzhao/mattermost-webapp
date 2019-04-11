@@ -330,9 +330,9 @@ export function renderSystemMessage(post, channel) {
             return (
                 <PostAddChannelMember
                     postId={addMemberProps.post_id}
-                    userIds={addMemberProps.user_ids}
+                    userIds={addMemberProps.no_channel_user_ids}
                     noGroupsUsernames={addMemberProps.no_groups_usernames}
-                    usernames={addMemberProps.usernames}
+                    usernames={addMemberProps.no_channel_usernames}
                 />
             );
         }
