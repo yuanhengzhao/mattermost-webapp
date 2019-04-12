@@ -139,7 +139,7 @@ export default class PostAddChannelMember extends React.PureComponent {
 
         let outOfChannelMessageID;
         let outOfChannelMessageText;
-        const atMentions1 = this.generateAtMentions(usernames);
+        const outOfChannelAtMentions = this.generateAtMentions(usernames);
         if (usernames.length === 1) {
             outOfChannelMessageID = t('post_body.check_for_out_of_channel_mentions.message.one');
             outOfChannelMessageText = 'did not get notified by this mention because they are not in the channel. Would you like to ';
@@ -150,7 +150,7 @@ export default class PostAddChannelMember extends React.PureComponent {
 
         let outOfGroupsMessageID;
         let outOfGroupsMessageText;
-        const atMentions2 = this.generateAtMentions(noGroupsUsernames);
+        const outOfGroupsAtMentions = this.generateAtMentions(noGroupsUsernames);
         if (noGroupsUsernames.length) {
             outOfGroupsMessageID = t('post_body.check_for_out_of_channel_groups_mentions.message');
             outOfGroupsMessageText = 'did not get notified by this mention because they are not in the channel. They are also not a member of the groups linked to this channel.';
@@ -162,7 +162,7 @@ export default class PostAddChannelMember extends React.PureComponent {
         if (usernames.length) {
             outOfChannelMessage = (
                 <p>
-                    {atMentions1}
+                    {outOfChannelAtMentions}
                     {' '}
                     <FormattedMessage
                         id={outOfChannelMessageID}
@@ -188,7 +188,7 @@ export default class PostAddChannelMember extends React.PureComponent {
         if (noGroupsUsernames.length) {
             outOfGroupsMessage = (
                 <p>
-                    {atMentions2}
+                    {outOfGroupsAtMentions}
                     {' '}
                     <FormattedMessage
                         id={outOfGroupsMessageID}
